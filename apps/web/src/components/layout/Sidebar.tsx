@@ -124,6 +124,7 @@ function ProjectItem({
 
 export function Sidebar({ onSearch }: { onSearch?: () => void }) {
   const { projects, loading, createProject, createDocument } = useProjects()
+  const pathname = usePathname()
 
   return (
     <aside className="flex flex-col w-[240px] shrink-0 bg-[var(--color-sidebar)] border-r border-[var(--color-border)] h-screen overflow-hidden">
@@ -199,10 +200,18 @@ export function Sidebar({ onSearch }: { onSearch?: () => void }) {
           <span className="flex-1 text-left">Search</span>
           <kbd className="text-[10px] text-[var(--color-text-faint)] bg-[var(--color-border)] px-1.5 py-0.5 rounded font-mono">⌘K</kbd>
         </button>
-        <button className="w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)] transition-colors">
+        <Link
+          href="/settings"
+          className={cn(
+            'w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors',
+            pathname === '/settings'
+              ? 'bg-[var(--color-accent-subtle)] text-[var(--color-text)] font-medium'
+              : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
+          )}
+        >
           <Settings className="w-4 h-4" />
           <span>Settings</span>
-        </button>
+        </Link>
       </div>
     </aside>
   )

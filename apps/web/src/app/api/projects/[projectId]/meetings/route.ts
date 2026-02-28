@@ -24,7 +24,7 @@ export async function GET(_req: Request, { params }: Params) {
 export async function POST(req: Request, { params }: Params) {
   const { projectId } = await params
   const db = createServiceClient()
-  const { title, transcript } = await req.json()
+  const { title, transcript, model } = await req.json()
 
   if (!title?.trim() || !transcript?.trim()) {
     return NextResponse.json({ error: 'title and transcript are required' }, { status: 400 })
@@ -110,7 +110,7 @@ If no updates are needed, return [].`
   try {
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: model ?? 'claude-sonnet-4-6',
       max_tokens: 2048,
       messages: [{ role: 'user', content: userPrompt }],
     })

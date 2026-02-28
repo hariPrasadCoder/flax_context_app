@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSettingsStore } from '@/stores/settings-store'
 
 interface DocumentRow {
   id: string
@@ -26,6 +27,7 @@ export function useProjects() {
   const [projects, setProjects] = useState<ProjectRow[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const defaultDocStatus = useSettingsStore((s) => s.defaultDocStatus)
 
   const fetchProjects = useCallback(() => {
     fetch('/api/projects')
@@ -61,7 +63,7 @@ export function useProjects() {
       const res = await fetch(`/api/projects/${projectId}/documents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, status: defaultDocStatus }),
       })
       const doc = await res.json()
       if (!doc.error) {

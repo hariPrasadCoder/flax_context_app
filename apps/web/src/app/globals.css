@@ -314,3 +314,83 @@
   outline: 1px solid var(--color-accent);
   outline-offset: 2px;
 }
+
+/* ── BlockNote dark mode overrides ─────────────────────── */
+/* Override BlockNote's built-in dark theme to match our design system */
+html.dark .flax-blocknote .bn-editor,
+html.dark .flax-blocknote .bn-block-group,
+html.dark .flax-blocknote .bn-block,
+html.dark .flax-blocknote .bn-block-content,
+html.dark .flax-blocknote .bn-container {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+/* Code blocks — use a slightly darker surface, not pitch black */
+html.dark .flax-blocknote [data-content-type="codeBlock"] {
+  background-color: hsl(0 0% 8%) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+}
+
+html.dark .flax-blocknote [data-content-type="codeBlock"] * {
+  color: hsl(0 0% 82%) !important;
+}
+
+/* Inline code */
+html.dark .flax-blocknote code {
+  background: hsl(0 0% 18%) !important;
+  color: hsl(0 0% 88%) !important;
+}
+
+/* Table borders */
+html.dark .flax-blocknote table,
+html.dark .flax-blocknote td,
+html.dark .flax-blocknote th {
+  border-color: var(--color-border) !important;
+}
+
+html.dark .flax-blocknote th {
+  background-color: var(--color-sidebar) !important;
+}
+
+/* Slash menu / suggestion popover */
+html.dark .bn-suggestion-menu {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+html.dark .bn-suggestion-menu-item:hover {
+  background: var(--color-sidebar-hover) !important;
+}
+
+/* Toolbar */
+html.dark .bn-toolbar {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+}
+
+html.dark .bn-toolbar button {
+  color: var(--color-text-muted) !important;
+}
+
+html.dark .bn-toolbar button:hover {
+  background: var(--color-sidebar-hover) !important;
+}
+
+/* ── Dark mode ──────────────────────────────────────────── */
+html.dark {
+  --color-bg: hsl(0 0% 10%);
+  --color-surface: hsl(0 0% 14%);
+  --color-sidebar: hsl(0 0% 12%);
+  --color-sidebar-hover: hsl(0 0% 18%);
+  --color-border: hsl(0 0% 22%);
+  --color-border-strong: hsl(0 0% 35%);
+  --color-text: hsl(0 0% 92%);
+  --color-text-muted: hsl(0 0% 60%);
+  --color-text-faint: hsl(0 0% 40%);
+  --color-accent: hsl(0 0% 88%);
+  --color-accent-subtle: hsl(0 0% 20%);
+  --color-changed: hsl(35 55% 55%);
+  --color-changed-subtle: hsl(35 30% 18%);
+}

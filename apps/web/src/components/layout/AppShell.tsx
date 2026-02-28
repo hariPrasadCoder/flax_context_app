@@ -3,9 +3,16 @@
 import { useState, useEffect } from 'react'
 import { Sidebar } from './Sidebar'
 import { SearchModal } from '@/components/search/SearchModal'
+import { useSettingsStore } from '@/stores/settings-store'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false)
+  const theme = useSettingsStore((s) => s.theme)
+
+  // Apply/remove dark class on <html> whenever theme changes
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark')
+  }, [theme])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

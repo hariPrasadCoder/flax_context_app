@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays } from 'lucide-react'
 import { AppShell } from '@/components/layout/AppShell'
+import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
 import { formatRelativeTime, formatDate } from '@/lib/utils'
@@ -25,6 +26,7 @@ function MeetingImportModal({
   const [transcript, setTranscript] = useState('')
   const [status, setStatus] = useState<'idle' | 'saving' | 'analyzing' | 'done'>('idle')
   const [result, setResult] = useState<{ proposalCount: number; warning?: string } | null>(null)
+  const aiModel = useSettingsStore((s) => s.aiModel)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +36,7 @@ function MeetingImportModal({
       const res = await fetch(`/api/projects/${projectId}/meetings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), transcript: transcript.trim() }),
+        body: JSON.stringify({ title: title.trim(), transcript: transcript.trim(), model: aiModel }),
       })
       setStatus('analyzing')
       const data = await res.json()

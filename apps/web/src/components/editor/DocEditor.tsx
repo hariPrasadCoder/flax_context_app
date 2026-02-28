@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
+import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useDocument } from '@/hooks/useDocument'
 import { EditorHeader } from './EditorHeader'
@@ -15,9 +16,17 @@ interface DocEditorProps {
 }
 
 export function DocEditor({ docId }: DocEditorProps) {
-  const { doc, loading, saving, saveContent, saveTitle } = useDocument(docId)
+  const { doc, loading, saving, saveContent, saveTitle, publishDoc } = useDocument(docId)
+  const { authorName, authorColor } = useSettingsStore()
   const { history, changedBlockIds, historyByBlock, addEntry, refetch: refetchHistory } = useBlockHistory(docId)
   const { pendingCount, refetch: refetchProposals } = useProposedChanges(docId)
+
+  // Use a ref so handleBlockChange stays stable and never causes
+  // BlockNoteEditor to tear down + re-register its editor.onChange listener.
+  const docStatusRef = useRef<'draft' | 'published'>(doc?.status ?? 'draft')
+  useEffect(() => {
+    if (doc?.status) docStatusRef.current = doc.status
+  }, [doc?.status])
 
   const handleContentChange = useCallback(
     (content: unknown) => { saveContent(content) },
@@ -26,13 +35,14 @@ export function DocEditor({ docId }: DocEditorProps) {
 
   const handleBlockChange = useCallback(
     (blockId: string, before: string, after: string) => {
+      if (docStatusRef.current === 'draft') return
       addEntry({
         blockId,
         beforeContent: before || null,
         afterContent: after,
         source: 'manual',
-        authorName: 'You',
-        authorColor: '#2563EB',
+        authorName,
+        authorColor,
       })
     },
     [addEntry]
@@ -96,6 +106,8 @@ export function DocEditor({ docId }: DocEditorProps) {
         onTitleChange={saveTitle}
         historyCount={history.length}
         pendingCount={pendingCount}
+        status={doc.status}
+        onPublish={publishDoc}
       />
       <div className="flex flex-1 overflow-hidden">
         <EditorCanvas

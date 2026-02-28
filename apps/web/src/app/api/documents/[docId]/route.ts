@@ -29,6 +29,7 @@ export async function PATCH(req: Request, { params }: Params) {
     .update({
       ...(body.title !== undefined && { title: body.title }),
       ...(body.content !== undefined && { content: body.content }),
+      ...(body.status !== undefined && { status: body.status }),
     })
     .eq('id', docId)
     .select()

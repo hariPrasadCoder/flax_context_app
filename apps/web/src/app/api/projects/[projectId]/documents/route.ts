@@ -17,6 +17,7 @@ export async function POST(req: Request, { params }: Params) {
       title: body.title ?? 'Untitled',
       parent_id: body.parentId ?? null,
       content: null,
+      status: body.status ?? 'draft',
     })
     .select()
     .single()

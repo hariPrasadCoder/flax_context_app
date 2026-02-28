@@ -10,6 +10,7 @@ import {
 import { BlockNoteView } from '@blocknote/mantine'
 import '@blocknote/mantine/style.css'
 import { useEditorStore } from '@/stores/editor-store'
+import { useSettingsStore } from '@/stores/settings-store'
 
 interface BlockNoteEditorProps {
   docId: string
@@ -53,6 +54,7 @@ export function BlockNoteEditor({
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prevHoveredRef = useRef<string | null>(null)
   const { openHistoryPanel } = useEditorStore()
+  const isDark = useSettingsStore((s) => s.theme === 'dark')
 
   const editor = useCreateBlockNote({
     ...(initialContent ? { initialContent: initialContent as PartialBlock[] } : {}),
@@ -171,7 +173,7 @@ export function BlockNoteEditor({
         <style dangerouslySetInnerHTML={{ __html: changedBlockCSS }} />
       )}
 
-      <BlockNoteView editor={editor} theme="light" slashMenu={false}>
+      <BlockNoteView editor={editor} theme={isDark ? 'dark' : 'light'} slashMenu={false}>
         <SuggestionMenuController
           triggerCharacter="/"
           getItems={getSlashMenuItems}

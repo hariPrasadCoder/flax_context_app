@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSettingsStore } from '@/stores/settings-store'
 
 interface DocumentData {
   id: string
@@ -8,6 +9,7 @@ interface DocumentData {
   content: unknown
   project_id: string
   updated_at: string
+  status: 'draft' | 'published'
 }
 
 export function useDocument(docId: string) {
@@ -16,6 +18,7 @@ export function useDocument(docId: string) {
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const autoSaveDelay = useSettingsStore((s) => s.autoSaveDelay)
 
   useEffect(() => {
     fetch(`/api/documents/${docId}`)
@@ -44,9 +47,9 @@ export function useDocument(docId: string) {
         } finally {
           setSaving(false)
         }
-      }, 800) // debounce 800ms
+      }, autoSaveDelay)
     },
-    [docId]
+    [docId, autoSaveDelay]
   )
 
   const saveTitle = useCallback(
@@ -62,5 +65,15 @@ export function useDocument(docId: string) {
     [docId]
   )
 
-  return { doc, loading, error, saving, saveContent, saveTitle }
+  const publishDoc = useCallback(async () => {
+    const res = await fetch(`/api/documents/${docId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'published' }),
+    })
+    const data = await res.json()
+    if (!data.error) setDoc((d) => d ? { ...d, status: 'published' } : d)
+  }, [docId])
+
+  return { doc, loading, error, saving, saveContent, saveTitle, publishDoc }
 }

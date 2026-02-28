@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Loader2,
   Bot,
+  Zap,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/stores/editor-store'
@@ -23,6 +24,8 @@ interface EditorHeaderProps {
   onTitleChange: (title: string) => Promise<void>
   historyCount?: number
   pendingCount?: number
+  status?: 'draft' | 'published'
+  onPublish?: () => Promise<void>
 }
 
 export function EditorHeader({
@@ -33,6 +36,8 @@ export function EditorHeader({
   onTitleChange,
   historyCount = 0,
   pendingCount = 0,
+  status = 'published',
+  onPublish,
 }: EditorHeaderProps) {
   const router = useRouter()
   const {
@@ -41,6 +46,7 @@ export function EditorHeader({
   } = useEditorStore()
   const { projects } = useProjects()
   const [localTitle, setLocalTitle] = useState(title)
+  const [publishing, setPublishing] = useState(false)
 
   useEffect(() => { setLocalTitle(title) }, [title])
 
@@ -104,38 +110,56 @@ export function EditorHeader({
         }
       </div>
 
-      {/* AI Suggestions button — only shown when there are pending proposals */}
-      {pendingCount > 0 && (
+      {status === 'draft' ? (
+        /* Draft mode — Publish CTA */
         <button
-          onClick={toggleProposals}
-          className={cn(
-            'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
-            proposalsPanelOpen
-              ? 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)]'
-              : 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)] hover:opacity-80'
-          )}
+          onClick={async () => {
+            if (!onPublish) return
+            setPublishing(true)
+            await onPublish()
+            setPublishing(false)
+          }}
+          disabled={publishing}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[var(--color-accent)] text-white text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-60 shrink-0"
         >
-          <Bot className="w-3.5 h-3.5" />
-          <span className="text-xs">{pendingCount} update{pendingCount !== 1 ? 's' : ''}</span>
+          {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+          <span>Publish</span>
         </button>
-      )}
+      ) : (
+        /* Published mode — AI suggestions + History */
+        <>
+          {pendingCount > 0 && (
+            <button
+              onClick={toggleProposals}
+              className={cn(
+                'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
+                proposalsPanelOpen
+                  ? 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)]'
+                  : 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)] hover:opacity-80'
+              )}
+            >
+              <Bot className="w-3.5 h-3.5" />
+              <span className="text-xs">{pendingCount} update{pendingCount !== 1 ? 's' : ''}</span>
+            </button>
+          )}
 
-      {/* History */}
-      <button
-        onClick={toggleHistory}
-        className={cn(
-          'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
-          historyPanelOpen
-            ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent)]'
-            : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
-        )}
-      >
-        <History className="w-3.5 h-3.5" />
-        <span className="hidden md:inline text-xs">History</span>
-        {historyCount > 0 && !historyPanelOpen && (
-          <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--color-changed)]" />
-        )}
-      </button>
+          <button
+            onClick={toggleHistory}
+            className={cn(
+              'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
+              historyPanelOpen
+                ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent)]'
+                : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
+            )}
+          >
+            <History className="w-3.5 h-3.5" />
+            <span className="hidden md:inline text-xs">History</span>
+            {historyCount > 0 && !historyPanelOpen && (
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--color-changed)]" />
+            )}
+          </button>
+        </>
+      )}
 
       <button className="flex items-center justify-center w-7 h-7 rounded-md text-[var(--color-text-faint)] hover:text-[var(--color-text)] hover:bg-[var(--color-sidebar-hover)] transition-colors shrink-0">
         <MoreHorizontal className="w-4 h-4" />
