@@ -7,13 +7,14 @@ import {
   ChevronDown,
   ChevronRight,
   FilePlus,
-  FolderPlus,
   FileText,
   Settings,
   Zap,
   Plus,
+  Search,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
 
 interface DocumentRow {
@@ -41,20 +42,31 @@ function DocItem({ doc }: { doc: DocumentRow }) {
     <Link
       href={`/docs/${doc.id}`}
       className={cn(
-        'group flex items-center gap-2 rounded-md text-sm transition-colors duration-100 py-1',
+        'flex items-center gap-2 rounded-md text-sm transition-colors duration-100 py-1',
         isActive
           ? 'bg-[var(--color-accent-subtle)] text-[var(--color-accent)] font-medium'
           : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
       )}
       style={{ paddingLeft: '22px', paddingRight: '8px' }}
     >
-      <FileText className={cn('w-3.5 h-3.5 shrink-0', isActive ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-faint)]')} />
+      <FileText
+        className={cn(
+          'w-3.5 h-3.5 shrink-0',
+          isActive ? 'text-[var(--color-accent)]' : 'text-[var(--color-text-faint)]'
+        )}
+      />
       <span className="truncate">{doc.title}</span>
     </Link>
   )
 }
 
-function ProjectItem({ project, onNewDoc }: { project: ProjectRow; onNewDoc: (id: string) => void }) {
+function ProjectItem({
+  project,
+  onNewDoc,
+}: {
+  project: ProjectRow
+  onNewDoc: (id: string) => void
+}) {
   const pathname = usePathname()
   const isProjectActive = project.documents.some((d) => pathname === `/docs/${d.id}`)
   const [expanded, setExpanded] = useState<boolean>(isProjectActive)
@@ -110,7 +122,7 @@ function ProjectItem({ project, onNewDoc }: { project: ProjectRow; onNewDoc: (id
   )
 }
 
-export function Sidebar() {
+export function Sidebar({ onSearch }: { onSearch?: () => void }) {
   const { projects, loading, createProject, createDocument } = useProjects()
 
   return (
@@ -142,9 +154,26 @@ export function Sidebar() {
         </div>
 
         {loading ? (
-          <div className="space-y-2 px-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-7 bg-[var(--color-border)] rounded-md animate-pulse" />
+          <div className="space-y-1 px-1">
+            {/* Project row + 2 doc items, repeated twice */}
+            {[1, 2].map((i) => (
+              <div key={i} className="space-y-1 mb-3">
+                <div className="flex items-center gap-2 px-2 py-1.5">
+                  <Skeleton className="w-5 h-5 rounded shrink-0" />
+                  <Skeleton className="flex-1 h-3.5" />
+                  <Skeleton className="w-3 h-3 shrink-0" />
+                </div>
+                <div className="space-y-1 pl-2">
+                  <div className="flex items-center gap-2 py-1" style={{ paddingLeft: '22px' }}>
+                    <Skeleton className="w-3.5 h-3.5 shrink-0" />
+                    <Skeleton className="flex-1 h-3" />
+                  </div>
+                  <div className="flex items-center gap-2 py-1" style={{ paddingLeft: '22px' }}>
+                    <Skeleton className="w-3.5 h-3.5 shrink-0" />
+                    <Skeleton className="w-2/3 h-3" />
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
         ) : (
@@ -161,7 +190,15 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-[var(--color-border)] p-2">
+      <div className="shrink-0 border-t border-[var(--color-border)] p-2 space-y-0.5">
+        <button
+          onClick={onSearch}
+          className="w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)] transition-colors"
+        >
+          <Search className="w-4 h-4" />
+          <span className="flex-1 text-left">Search</span>
+          <kbd className="text-[10px] text-[var(--color-text-faint)] bg-[var(--color-border)] px-1.5 py-0.5 rounded font-mono">⌘K</kbd>
+        </button>
         <button className="w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)] transition-colors">
           <Settings className="w-4 h-4" />
           <span>Settings</span>

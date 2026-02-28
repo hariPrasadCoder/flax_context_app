@@ -24,7 +24,7 @@ export function EditorCanvas({
   changedBlockIds,
 }: EditorCanvasProps) {
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto bg-[var(--color-surface)]">
       <div className="max-w-[780px] mx-auto py-10 pb-40 px-16">
         <BlockNoteEditor
           docId={docId}

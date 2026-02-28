@@ -52,7 +52,7 @@ export function BlockNoteEditor({
   const snapshotRef = useRef<Map<string, string>>(new Map())
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prevHoveredRef = useRef<string | null>(null)
-  const { openHistoryPanel, historyPanelOpen } = useEditorStore()
+  const { openHistoryPanel } = useEditorStore()
 
   const editor = useCreateBlockNote({
     ...(initialContent ? { initialContent: initialContent as PartialBlock[] } : {}),
@@ -104,25 +104,33 @@ export function BlockNoteEditor({
   }, [editor, onContentChange, onBlockChange])
 
   // Amber left-border stripe on blocks with history.
-  // Uses box-shadow so it doesn't affect layout or conflict with BlockNote's
-  // own drag-handle / plus-button that live in the same left gutter.
+  // Applied to .bn-block-content with padding-left so there's breathing room
+  // between the stripe and the text (like a diff/blockquote indicator).
   const changedBlockCSS = Array.from(changedBlockIds)
     .map(
       (id) => `
       .flax-blocknote [data-id="${id}"] > .bn-block {
-        box-shadow: -3px 0 0 0 var(--color-changed);
-        border-radius: 0 4px 4px 0;
-        transition: box-shadow 0.15s;
+        position: relative;
+      }
+      .flax-blocknote [data-id="${id}"] > .bn-block::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 2px;
+        bottom: 2px;
+        width: 3px;
+        background-color: var(--color-changed);
+        border-radius: 2px;
+        transition: opacity 0.15s;
       }
       .flax-blocknote [data-id="${id}"]:hover > .bn-block {
-        box-shadow: -4px 0 0 0 var(--color-changed);
-        background-color: color-mix(in oklch, var(--color-changed) 5%, transparent);
+        background-color: color-mix(in srgb, var(--color-changed) 6%, transparent);
       }
     `
     )
     .join('\n')
 
-  // Hover detection — mousemove on the editor wrapper
+  // Hover detection — open history panel when hovering a changed block
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       const el = (e.target as Element).closest('[data-id]')

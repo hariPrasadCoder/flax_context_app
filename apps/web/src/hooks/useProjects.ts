@@ -73,5 +73,21 @@ export function useProjects() {
     [fetchProjects, router]
   )
 
-  return { projects, loading, createProject, createDocument, refetch: fetchProjects }
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      await fetch(`/api/projects/${projectId}`, { method: 'DELETE' })
+      fetchProjects()
+    },
+    [fetchProjects]
+  )
+
+  const deleteDocument = useCallback(
+    async (docId: string) => {
+      await fetch(`/api/documents/${docId}`, { method: 'DELETE' })
+      fetchProjects()
+    },
+    [fetchProjects]
+  )
+
+  return { projects, loading, createProject, createDocument, deleteProject, deleteDocument, refetch: fetchProjects }
 }

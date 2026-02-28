@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation'
 import {
   ArrowLeft,
   History,
-  Share2,
   MoreHorizontal,
   Check,
   ChevronRight,
   Loader2,
+  Bot,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/stores/editor-store'
@@ -22,35 +22,53 @@ interface EditorHeaderProps {
   saving: boolean
   onTitleChange: (title: string) => Promise<void>
   historyCount?: number
+  pendingCount?: number
 }
 
-export function EditorHeader({ docId, title, projectId, saving, onTitleChange, historyCount = 0 }: EditorHeaderProps) {
+export function EditorHeader({
+  docId,
+  title,
+  projectId,
+  saving,
+  onTitleChange,
+  historyCount = 0,
+  pendingCount = 0,
+}: EditorHeaderProps) {
   const router = useRouter()
-  const { historyPanelOpen, closeHistoryPanel, openHistoryPanel } = useEditorStore()
+  const {
+    historyPanelOpen, closeHistoryPanel, openHistoryPanel,
+    proposalsPanelOpen, openProposalsPanel, closeProposalsPanel,
+  } = useEditorStore()
   const { projects } = useProjects()
   const [localTitle, setLocalTitle] = useState(title)
 
-  useEffect(() => {
-    setLocalTitle(title)
-  }, [title])
+  useEffect(() => { setLocalTitle(title) }, [title])
 
   const project = projects.find((p) => p.id === projectId)
 
   const handleTitleBlur = () => {
-    if (localTitle !== title) {
-      onTitleChange(localTitle)
-    }
+    if (localTitle !== title) onTitleChange(localTitle)
   }
 
   const handleTitleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') e.currentTarget.blur()
   }
 
+  const toggleHistory = () => {
+    if (historyPanelOpen) closeHistoryPanel()
+    else openHistoryPanel()
+  }
+
+  const toggleProposals = () => {
+    if (proposalsPanelOpen) closeProposalsPanel()
+    else openProposalsPanel()
+  }
+
   return (
     <header className="flex items-center h-13 px-4 border-b border-[var(--color-border)] bg-[var(--color-surface)] shrink-0 gap-2">
       {/* Back */}
       <button
-        onClick={() => router.push('/')}
+        onClick={() => router.push(`/projects/${projectId}`)}
         className="flex items-center justify-center w-7 h-7 rounded-md text-[var(--color-text-faint)] hover:text-[var(--color-text)] hover:bg-[var(--color-sidebar-hover)] transition-colors shrink-0"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -86,9 +104,25 @@ export function EditorHeader({ docId, title, projectId, saving, onTitleChange, h
         }
       </div>
 
+      {/* AI Suggestions button — only shown when there are pending proposals */}
+      {pendingCount > 0 && (
+        <button
+          onClick={toggleProposals}
+          className={cn(
+            'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
+            proposalsPanelOpen
+              ? 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)]'
+              : 'bg-[var(--color-changed-subtle)] text-[var(--color-changed)] hover:opacity-80'
+          )}
+        >
+          <Bot className="w-3.5 h-3.5" />
+          <span className="text-xs">{pendingCount} update{pendingCount !== 1 ? 's' : ''}</span>
+        </button>
+      )}
+
       {/* History */}
       <button
-        onClick={() => historyPanelOpen ? closeHistoryPanel() : openHistoryPanel()}
+        onClick={toggleHistory}
         className={cn(
           'relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0',
           historyPanelOpen
@@ -98,16 +132,9 @@ export function EditorHeader({ docId, title, projectId, saving, onTitleChange, h
       >
         <History className="w-3.5 h-3.5" />
         <span className="hidden md:inline text-xs">History</span>
-        {/* Amber dot — visible when there's history and the panel is closed */}
         {historyCount > 0 && !historyPanelOpen && (
           <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[var(--color-changed)]" />
         )}
-      </button>
-
-      {/* Share */}
-      <button className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[var(--color-accent)] text-white rounded-md text-xs font-medium hover:opacity-90 transition-opacity shrink-0">
-        <Share2 className="w-3.5 h-3.5" />
-        <span className="hidden md:inline">Share</span>
       </button>
 
       <button className="flex items-center justify-center w-7 h-7 rounded-md text-[var(--color-text-faint)] hover:text-[var(--color-text)] hover:bg-[var(--color-sidebar-hover)] transition-colors shrink-0">

@@ -1,0 +1,250 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F305CF21B1084E109C92F9BE /* FlaxApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745912239D2D4F70A84357C5 /* FlaxApp.swift */; };
+		B96F9820FCE341D18CC2AD23 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99966216DCE485995B3F88A /* AppState.swift */; };
+		3FAC786D2CDE4DA48152FC0F /* FlaxTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F234314750DA4A7C819E89C5 /* FlaxTheme.swift */; };
+		CAEF049E7434423984AB7C5B /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8894BED749C2435DB625C5C6 /* Meeting.swift */; };
+		219B1098210B4B1BABBA8CF9 /* SystemAudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A997F422338442E3A07370D8 /* SystemAudioRecorder.swift */; };
+		5090422B8DF5446A9273A43C /* MicRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFDF3522B69549F9B0AB3D46 /* MicRecorder.swift */; };
+		299F62DC091B4DB4A69D870F /* TranscriptionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF5DF59B90F49EDB2C0719F /* TranscriptionEngine.swift */; };
+		AC2B072DCB604020AA9D6917 /* AudioLevelMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59E925EC8E604751A360B55F /* AudioLevelMonitor.swift */; };
+		7C7BF0AD0BA24BD583694BD1 /* CalendarMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA0F9970680B4AFEA6123629 /* CalendarMonitor.swift */; };
+		A3148CEE30614952ADC254D8 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C33EB3918DD24314B01EA749 /* MenuBarView.swift */; };
+		2B43A5CCBD8C46B98C39A7D8 /* RecordingConfirmationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C461A0DBC6440AA95315D8 /* RecordingConfirmationView.swift */; };
+		68FE0BE35DA2432192789DC1 /* RecordingStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FAFBECF25C04AB28AFE682B /* RecordingStatusView.swift */; };
+		D19C336F6416414C9BC65A9F /* MeetingRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC42E339AD14045B9F5F3E8 /* MeetingRowView.swift */; };
+		5B7E21BCF5C445759FCA7BC5 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C98328AC5E4B1EA31A4679 /* SettingsView.swift */; };
+		B4AFB34404BF43E58DD13197 /* MainWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1EF2C7CCAC148FD9FBDEC5F /* MainWindowView.swift */; };
+		4E2976CC8CB84852B101F830 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B41DFB4EBF39486496594496 /* SidebarView.swift */; };
+		A8C4D41B4090461483A4B885 /* MeetingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1530A4D98E6948D3AEF4E95D /* MeetingDetailView.swift */; };
+		49DDFA2D8A484783BBC7140C /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6E5BBDCC66B44561BB285C80 /* WhisperKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		745912239D2D4F70A84357C5 /* FlaxApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlaxApp.swift; path = Sources/Flax/FlaxApp.swift; sourceTree = "<group>"; };
+		B99966216DCE485995B3F88A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppState.swift; path = Sources/Flax/AppState.swift; sourceTree = "<group>"; };
+		F234314750DA4A7C819E89C5 /* FlaxTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FlaxTheme.swift; path = Sources/Flax/Theme/FlaxTheme.swift; sourceTree = "<group>"; };
+		8894BED749C2435DB625C5C6 /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Meeting.swift; path = Sources/Flax/Models/Meeting.swift; sourceTree = "<group>"; };
+		A997F422338442E3A07370D8 /* SystemAudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SystemAudioRecorder.swift; path = Sources/Flax/Audio/SystemAudioRecorder.swift; sourceTree = "<group>"; };
+		DFDF3522B69549F9B0AB3D46 /* MicRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MicRecorder.swift; path = Sources/Flax/Audio/MicRecorder.swift; sourceTree = "<group>"; };
+		7DF5DF59B90F49EDB2C0719F /* TranscriptionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TranscriptionEngine.swift; path = Sources/Flax/Transcription/TranscriptionEngine.swift; sourceTree = "<group>"; };
+		59E925EC8E604751A360B55F /* AudioLevelMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AudioLevelMonitor.swift; path = Sources/Flax/Services/AudioLevelMonitor.swift; sourceTree = "<group>"; };
+		EA0F9970680B4AFEA6123629 /* CalendarMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CalendarMonitor.swift; path = Sources/Flax/Services/CalendarMonitor.swift; sourceTree = "<group>"; };
+		C33EB3918DD24314B01EA749 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MenuBarView.swift; path = Sources/Flax/Views/MenuBarView.swift; sourceTree = "<group>"; };
+		14C461A0DBC6440AA95315D8 /* RecordingConfirmationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecordingConfirmationView.swift; path = Sources/Flax/Views/RecordingConfirmationView.swift; sourceTree = "<group>"; };
+		9FAFBECF25C04AB28AFE682B /* RecordingStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RecordingStatusView.swift; path = Sources/Flax/Views/RecordingStatusView.swift; sourceTree = "<group>"; };
+		0AC42E339AD14045B9F5F3E8 /* MeetingRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeetingRowView.swift; path = Sources/Flax/Views/MeetingRowView.swift; sourceTree = "<group>"; };
+		A4C98328AC5E4B1EA31A4679 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SettingsView.swift; path = Sources/Flax/Views/SettingsView.swift; sourceTree = "<group>"; };
+		F1EF2C7CCAC148FD9FBDEC5F /* MainWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MainWindowView.swift; path = Sources/Flax/Views/MainWindowView.swift; sourceTree = "<group>"; };
+		B41DFB4EBF39486496594496 /* SidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SidebarView.swift; path = Sources/Flax/Views/SidebarView.swift; sourceTree = "<group>"; };
+		1530A4D98E6948D3AEF4E95D /* MeetingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MeetingDetailView.swift; path = Sources/Flax/Views/MeetingDetailView.swift; sourceTree = "<group>"; };
+		A42AEA11C68448A3962B061A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7135028EFEC040B882CC76D9 /* Flax.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Flax.entitlements; sourceTree = "<group>"; };
+		A7671805529C4EDC98F48CB3 /* Flax.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flax.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3FCCFE19E4F94AC883E02CC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (49DDFA2D8A484783BBC7140C /* WhisperKit in Frameworks */,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F95C98C9D3C5494DB5059E9F = {
+			isa = PBXGroup;
+			children = (FB8B3C2178DA46DA9C711D6A /* Sources */, A42AEA11C68448A3962B061A /* Info.plist */, 7135028EFEC040B882CC76D9 /* Flax.entitlements */, DB8AAF1A27494B88BEE38D47 /* Products */,);
+			sourceTree = "<group>";
+		};
+		DB8AAF1A27494B88BEE38D47 /* Products */ = {
+			isa = PBXGroup;
+			children = (A7671805529C4EDC98F48CB3 /* Flax.app */,);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FB8B3C2178DA46DA9C711D6A /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				745912239D2D4F70A84357C5 /* FlaxApp.swift */,
+				B99966216DCE485995B3F88A /* AppState.swift */,
+				F234314750DA4A7C819E89C5 /* FlaxTheme.swift */,
+				8894BED749C2435DB625C5C6 /* Meeting.swift */,
+				A997F422338442E3A07370D8 /* SystemAudioRecorder.swift */,
+				DFDF3522B69549F9B0AB3D46 /* MicRecorder.swift */,
+				7DF5DF59B90F49EDB2C0719F /* TranscriptionEngine.swift */,
+				59E925EC8E604751A360B55F /* AudioLevelMonitor.swift */,
+				EA0F9970680B4AFEA6123629 /* CalendarMonitor.swift */,
+				C33EB3918DD24314B01EA749 /* MenuBarView.swift */,
+				14C461A0DBC6440AA95315D8 /* RecordingConfirmationView.swift */,
+				9FAFBECF25C04AB28AFE682B /* RecordingStatusView.swift */,
+				0AC42E339AD14045B9F5F3E8 /* MeetingRowView.swift */,
+				A4C98328AC5E4B1EA31A4679 /* SettingsView.swift */,
+				F1EF2C7CCAC148FD9FBDEC5F /* MainWindowView.swift */,
+				B41DFB4EBF39486496594496 /* SidebarView.swift */,
+				1530A4D98E6948D3AEF4E95D /* MeetingDetailView.swift */,
+			);
+			name = Sources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5C960EF059B7475F85B42151 /* Flax */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7FDB80A696B64B6F9FF988CC;
+			buildPhases = (09D57345B31F43A69035C577 /* Sources */, 3FCCFE19E4F94AC883E02CC2 /* Frameworks */, 4F3C9B04C827472E926EE888 /* Resources */,);
+			buildRules = ();
+			dependencies = ();
+			name = Flax;
+			packageProductDependencies = (6E5BBDCC66B44561BB285C80 /* WhisperKit */,);
+			productName = Flax;
+			productReference = A7671805529C4EDC98F48CB3 /* Flax.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7ED7931381BD4EFBBCF6ABF8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 1500; LastUpgradeCheck = 1500;};
+			buildConfigurationList = 115114817EC84CF7BEA48502;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = F95C98C9D3C5494DB5059E9F;
+			packageReferences = (06409E2C008F439AAA1AEA1B /* XCRemoteSwiftPackageReference "WhisperKit" */,);
+			productRefGroup = DB8AAF1A27494B88BEE38D47 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (5C960EF059B7475F85B42151 /* Flax */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4F3C9B04C827472E926EE888 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		09D57345B31F43A69035C577 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F305CF21B1084E109C92F9BE /* FlaxApp.swift in Sources */,
+				B96F9820FCE341D18CC2AD23 /* AppState.swift in Sources */,
+				3FAC786D2CDE4DA48152FC0F /* FlaxTheme.swift in Sources */,
+				CAEF049E7434423984AB7C5B /* Meeting.swift in Sources */,
+				219B1098210B4B1BABBA8CF9 /* SystemAudioRecorder.swift in Sources */,
+				5090422B8DF5446A9273A43C /* MicRecorder.swift in Sources */,
+				299F62DC091B4DB4A69D870F /* TranscriptionEngine.swift in Sources */,
+				AC2B072DCB604020AA9D6917 /* AudioLevelMonitor.swift in Sources */,
+				7C7BF0AD0BA24BD583694BD1 /* CalendarMonitor.swift in Sources */,
+				A3148CEE30614952ADC254D8 /* MenuBarView.swift in Sources */,
+				2B43A5CCBD8C46B98C39A7D8 /* RecordingConfirmationView.swift in Sources */,
+				68FE0BE35DA2432192789DC1 /* RecordingStatusView.swift in Sources */,
+				D19C336F6416414C9BC65A9F /* MeetingRowView.swift in Sources */,
+				5B7E21BCF5C445759FCA7BC5 /* SettingsView.swift in Sources */,
+				B4AFB34404BF43E58DD13197 /* MainWindowView.swift in Sources */,
+				4E2976CC8CB84852B101F830 /* SidebarView.swift in Sources */,
+				A8C4D41B4090461483A4B885 /* MeetingDetailView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		CFD14324E7FF4BF3ABEE68F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",);
+				MACOSX_DEPLOYMENT_TARGET = 14.0; ONLY_ACTIVE_ARCH = YES; SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG; SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		0AE86D33369340D58B083D3E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ENABLE_NS_ASSERTIONS = NO;
+				GCC_OPTIMIZATION_LEVEL = s; MACOSX_DEPLOYMENT_TARGET = 14.0; SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule; SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		B15FA9C9A2244624A207D04D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Flax.entitlements; CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES; DEBUG_INFORMATION_FORMAT = dwarf;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",);
+				MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = "com.flax.mac";
+				PRODUCT_NAME = Flax; SDKROOT = macosx; SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		577472B49F08469F8120512A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Flax.entitlements; CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks",);
+				MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = "com.flax.mac";
+				PRODUCT_NAME = Flax; SDKROOT = macosx; SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		115114817EC84CF7BEA48502 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (CFD14324E7FF4BF3ABEE68F2 /* Debug */, 0AE86D33369340D58B083D3E /* Release */,);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7FDB80A696B64B6F9FF988CC = {
+			isa = XCConfigurationList;
+			buildConfigurations = (B15FA9C9A2244624A207D04D /* Debug */, 577472B49F08469F8120512A /* Release */,);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		06409E2C008F439AAA1AEA1B /* XCRemoteSwiftPackageReference "WhisperKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/argmaxinc/WhisperKit";
+			requirement = {kind = upToNextMajorVersion; minimumVersion = 0.9.0;};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6E5BBDCC66B44561BB285C80 /* WhisperKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 06409E2C008F439AAA1AEA1B /* XCRemoteSwiftPackageReference "WhisperKit" */;
+			productName = WhisperKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+	};
+	rootObject = 7ED7931381BD4EFBBCF6ABF8 /* Project object */;
+}

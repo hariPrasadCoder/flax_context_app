@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Plus, FileText, Clock, ArrowRight, Loader2 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
 import { formatRelativeTime } from '@/lib/utils'
 import { useState } from 'react'
@@ -128,7 +129,18 @@ export function Dashboard() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-44 rounded-xl bg-[var(--color-sidebar)] border border-[var(--color-border)] animate-pulse" />
+              <div key={i} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 space-y-4">
+                <div className="flex items-start justify-between">
+                  <Skeleton className="w-10 h-10 rounded-xl" />
+                  <Skeleton className="w-4 h-4 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+                <Skeleton className="h-3 w-1/3 mt-2" />
+              </div>
             ))}
           </div>
         ) : (
@@ -139,11 +151,10 @@ export function Dashboard() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {projects.map((project) => {
-                  const firstDoc = project.documents[0]
                   return (
                     <Link
                       key={project.id}
-                      href={firstDoc ? `/docs/${firstDoc.id}` : '#'}
+                      href={`/projects/${project.id}`}
                       className="group block bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-border-strong)] hover:shadow-sm transition-all duration-150"
                     >
                       <div className="flex items-start justify-between mb-4">
