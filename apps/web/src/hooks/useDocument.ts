@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { toast } from 'sonner'
 import { useSettingsStore } from '@/stores/settings-store'
 
 interface DocumentData {
@@ -72,7 +73,12 @@ export function useDocument(docId: string) {
       body: JSON.stringify({ status: 'published' }),
     })
     const data = await res.json()
-    if (!data.error) setDoc((d) => d ? { ...d, status: 'published' } : d)
+    if (!data.error) {
+      setDoc((d) => d ? { ...d, status: 'published' } : d)
+      toast.success('Document published — history tracking is now active')
+    } else {
+      toast.error('Failed to publish document')
+    }
   }, [docId])
 
   return { doc, loading, error, saving, saveContent, saveTitle, publishDoc }

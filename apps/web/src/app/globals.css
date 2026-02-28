@@ -46,6 +46,10 @@
   --color-accent-subtle: hsl(0 0% 90%);
   --color-changed: hsl(35 60% 45%);
   --color-changed-subtle: hsl(40 30% 94%);
+  --color-success: hsl(142 35% 35%);
+  --color-success-subtle: hsl(142 30% 94%);
+  --color-error: hsl(0 45% 42%);
+  --color-error-subtle: hsl(0 40% 95%);
 
   /* Radii — sharp corners */
   --radius-sm: 2px;
@@ -88,6 +92,14 @@
 
   * {
     box-sizing: border-box;
+  }
+
+  button, [role="button"], a, select, label[for] {
+    cursor: pointer;
+  }
+
+  button:disabled, [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
   }
 }
 
@@ -393,4 +405,8 @@ html.dark {
   --color-accent-subtle: hsl(0 0% 20%);
   --color-changed: hsl(35 55% 55%);
   --color-changed-subtle: hsl(35 30% 18%);
+  --color-success: hsl(142 45% 52%);
+  --color-success-subtle: hsl(142 25% 16%);
+  --color-error: hsl(0 60% 58%);
+  --color-error-subtle: hsl(0 30% 16%);
 }

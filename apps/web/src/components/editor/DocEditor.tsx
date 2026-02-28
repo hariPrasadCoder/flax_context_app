@@ -62,14 +62,15 @@ export function DocEditor({ docId }: DocEditorProps) {
           <Skeleton className="w-7 h-7 shrink-0" />
           <Skeleton className="w-24 h-4" />
           <Skeleton className="w-4 h-4" />
-          <Skeleton className="flex-1 h-5 max-w-xs" />
-          <Skeleton className="w-16 h-6 ml-auto" />
-          <Skeleton className="w-16 h-6" />
+          <div className="flex-1" />
+          <Skeleton className="w-14 h-5" />
+          <Skeleton className="w-18 h-6" />
+          <Skeleton className="w-7 h-7" />
         </div>
         {/* Document body skeleton */}
         <div className="flex-1 overflow-y-auto bg-[var(--color-surface)]">
-          <div className="max-w-[780px] mx-auto py-10 pb-40 px-16 space-y-3">
-            <Skeleton className="h-9 w-2/3 mb-8" />
+          <div className="max-w-[780px] mx-auto py-12 pb-40 px-16 space-y-3">
+            <Skeleton className="h-10 w-2/3 mb-10" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-[92%]" />
             <Skeleton className="h-4 w-[85%]" />
@@ -100,21 +101,23 @@ export function DocEditor({ docId }: DocEditorProps) {
     <div className="flex flex-col flex-1 overflow-hidden">
       <EditorHeader
         docId={docId}
-        title={doc.title}
         projectId={doc.project_id}
         saving={saving}
-        onTitleChange={saveTitle}
         historyCount={history.length}
         pendingCount={pendingCount}
         status={doc.status}
         onPublish={publishDoc}
+        docContent={doc.content}
+        docTitle={doc.title}
       />
       <div className="flex flex-1 overflow-hidden">
         <EditorCanvas
           docId={docId}
+          title={doc.title}
           initialContent={doc.content}
           onContentChange={handleContentChange}
           onBlockChange={handleBlockChange}
+          onTitleChange={saveTitle}
           changedBlockIds={changedBlockIds}
         />
         <HistoryPanel historyByBlock={historyByBlock} />

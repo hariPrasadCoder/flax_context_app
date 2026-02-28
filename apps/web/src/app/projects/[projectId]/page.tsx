@@ -3,7 +3,7 @@
 import { use, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays } from 'lucide-react'
+import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays, ChevronDown, ChevronRight as ChevronRightIcon } from 'lucide-react'
 import { AppShell } from '@/components/layout/AppShell'
 import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -51,7 +51,7 @@ function MeetingImportModal({
   if (status === 'done' && result) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
-        <div className="bg-[var(--color-surface)] rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+        <div className="bg-[var(--color-surface)] rounded-lg shadow-[var(--shadow-2xl)] border border-[var(--color-border)] w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-full bg-[var(--color-changed-subtle)] flex items-center justify-center">
               <Bot className="w-5 h-5 text-[var(--color-changed)]" />
@@ -82,7 +82,7 @@ function MeetingImportModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-[var(--color-surface)] rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-[var(--color-surface)] rounded-lg shadow-[var(--shadow-2xl)] border border-[var(--color-border)] w-full max-w-lg mx-4 p-6" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-base font-semibold text-[var(--color-text)] mb-1">Import meeting transcript</h2>
         <p className="text-xs text-[var(--color-text-muted)] mb-5">
           AI will read your docs and the transcript, then suggest block-level updates for your review.
@@ -145,7 +145,8 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
   const [tab, setTab] = useState<Tab>('docs')
   const [creating, setCreating] = useState(false)
   const [showMeetingModal, setShowMeetingModal] = useState(false)
-  const [meetings, setMeetings] = useState<Array<{ id: string; title: string; created_at: string }>>([])
+  const [meetings, setMeetings] = useState<Array<{ id: string; title: string; transcript: string; created_at: string }>>([])
+  const [expandedMeeting, setExpandedMeeting] = useState<string | null>(null)
   const [pendingByDoc, setPendingByDoc] = useState<Record<string, number>>({})
   const [confirmDeleteProject, setConfirmDeleteProject] = useState(false)
   const [deletingProject, setDeletingProject] = useState(false)
@@ -260,7 +261,7 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
           {/* Header */}
           <div className="flex items-start justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0" style={{ backgroundColor: `${project.color}18` }}>
+              <div className="w-12 h-12 rounded-md flex items-center justify-center text-2xl shrink-0 bg-[var(--color-sidebar)]">
                 {project.emoji}
               </div>
               <div>
@@ -374,13 +375,33 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
                 </div>
               ) : (
                 <div className="divide-y divide-[var(--color-border)]">
-                  {meetings.map((m) => (
-                    <div key={m.id} className="flex items-center gap-3 py-3">
-                      <CalendarDays className="w-4 h-4 text-[var(--color-text-faint)] shrink-0" />
-                      <span className="text-sm text-[var(--color-text)] flex-1 truncate">{m.title}</span>
-                      <span className="text-xs text-[var(--color-text-faint)]">{formatDate(new Date(m.created_at))}</span>
-                    </div>
-                  ))}
+                  {meetings.map((m) => {
+                    const isExpanded = expandedMeeting === m.id
+                    return (
+                      <div key={m.id}>
+                        <button
+                          onClick={() => setExpandedMeeting(isExpanded ? null : m.id)}
+                          className="w-full flex items-center gap-3 py-3 hover:bg-[var(--color-sidebar-hover)] px-1 rounded-md transition-colors text-left"
+                        >
+                          <CalendarDays className="w-4 h-4 text-[var(--color-text-faint)] shrink-0" />
+                          <span className="text-sm text-[var(--color-text)] flex-1 truncate">{m.title}</span>
+                          <span className="text-xs text-[var(--color-text-faint)] shrink-0">{formatDate(new Date(m.created_at))}</span>
+                          {isExpanded
+                            ? <ChevronDown className="w-3.5 h-3.5 text-[var(--color-text-faint)] shrink-0" />
+                            : <ChevronRightIcon className="w-3.5 h-3.5 text-[var(--color-text-faint)] shrink-0" />
+                          }
+                        </button>
+                        {isExpanded && (
+                          <div className="mb-3 mx-1 px-4 py-3 bg-[var(--color-sidebar)] rounded-md border border-[var(--color-border)]">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)] mb-2">Transcript</p>
+                            <p className="text-xs text-[var(--color-text-muted)] leading-relaxed whitespace-pre-wrap font-mono">
+                              {m.transcript}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </>
@@ -404,7 +425,7 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
               {/* Delete project */}
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-faint)] mb-3">Danger zone</h3>
-                <div className="border border-red-200 rounded-lg p-4 flex items-center justify-between gap-4">
+                <div className="border border-[var(--color-error)]/30 rounded-md p-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm font-medium text-[var(--color-text)]">Delete project</p>
                     <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
@@ -413,15 +434,15 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
                   </div>
                   {confirmDeleteProject ? (
                     <div className="flex items-center gap-2 shrink-0">
-                      <button onClick={handleDeleteProject} disabled={deletingProject} className="text-xs px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-60 font-medium">
+                      <button onClick={handleDeleteProject} disabled={deletingProject} className="text-xs px-3 py-1.5 bg-[var(--color-error)] text-white rounded-md hover:opacity-90 disabled:opacity-60 font-medium transition-opacity">
                         {deletingProject ? 'Deleting…' : 'Confirm delete'}
                       </button>
-                      <button onClick={() => setConfirmDeleteProject(false)} className="text-xs px-3 py-1.5 border border-[var(--color-border)] rounded hover:bg-[var(--color-sidebar-hover)]">
+                      <button onClick={() => setConfirmDeleteProject(false)} className="text-xs px-3 py-1.5 border border-[var(--color-border)] rounded-md hover:bg-[var(--color-sidebar-hover)]">
                         Cancel
                       </button>
                     </div>
                   ) : (
-                    <button onClick={() => setConfirmDeleteProject(true)} className="flex items-center gap-2 text-xs px-3 py-1.5 border border-red-300 text-red-600 rounded hover:bg-red-50 transition-colors shrink-0 font-medium">
+                    <button onClick={() => setConfirmDeleteProject(true)} className="flex items-center gap-2 text-xs px-3 py-1.5 border border-[var(--color-error)]/40 text-[var(--color-error)] rounded-md hover:bg-[var(--color-error-subtle)] transition-colors shrink-0 font-medium">
                       <Trash2 className="w-3.5 h-3.5" />
                       Delete project
                     </button>

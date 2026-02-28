@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Merriweather, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const merriweather = Merriweather({
@@ -37,6 +38,19 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: 'var(--color-surface)',
+              color: 'var(--color-text)',
+              border: '1px solid var(--color-border)',
+              borderRadius: '4px',
+              fontSize: '13px',
+              boxShadow: 'var(--shadow-md)',
+            },
+          }}
+        />
       </body>
     </html>
   );

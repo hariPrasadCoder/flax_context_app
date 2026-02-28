@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Bot, Check, Trash2, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useEditorStore } from '@/stores/editor-store'
 import { useProposedChanges } from '@/hooks/useProposedChanges'
 import { formatRelativeTime } from '@/lib/utils'
@@ -54,14 +55,14 @@ function ProposalCard({
           {/* Diff */}
           {change.before_content && (
             <div className="relative pl-3">
-              <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-red-300" />
+              <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-[var(--color-error)]" />
               <p className="text-xs text-[var(--color-text-muted)] line-through leading-relaxed opacity-75">
                 {change.before_content}
               </p>
             </div>
           )}
           <div className="relative pl-3">
-            <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-green-400" />
+            <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-[var(--color-success)]" />
             <p className="text-xs text-[var(--color-text)] leading-relaxed">
               {change.after_content}
             </p>
@@ -127,6 +128,7 @@ export function ProposedChangesPanel({ docId, onAccepted }: ProposedChangesPanel
     setAcceptingAll(true)
     await acceptAll()
     setAcceptingAll(false)
+    toast.success(`All ${changes.length} changes applied`)
     onAccepted?.()
   }
 
@@ -178,11 +180,14 @@ export function ProposedChangesPanel({ docId, onAccepted }: ProposedChangesPanel
                   key={change.id}
                   change={change}
                   onAccept={async () => {
-                    await fetch(`/api/proposed-changes/${change.id}`, {
+                    const res = await fetch(`/api/proposed-changes/${change.id}`, {
                       method: 'PATCH',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ action: 'accept' }),
                     })
+                    const data = await res.json()
+                    if (data.error) toast.error('Failed to apply change')
+                    else toast.success('Change applied')
                     onAccepted?.()
                   }}
                   onReject={async () => {
@@ -191,6 +196,7 @@ export function ProposedChangesPanel({ docId, onAccepted }: ProposedChangesPanel
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ action: 'reject' }),
                     })
+                    toast('Change dismissed')
                   }}
                 />
               ))

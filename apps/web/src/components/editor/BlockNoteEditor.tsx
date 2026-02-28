@@ -17,6 +17,7 @@ interface BlockNoteEditorProps {
   initialContent: unknown
   onContentChange: (content: unknown) => void
   onBlockChange?: (blockId: string, before: string, after: string) => void
+  onWordCountChange?: (count: number) => void
   changedBlockIds: Set<string>
 }
 
@@ -42,11 +43,32 @@ function buildSnapshot(blocks: Block[]): Map<string, string> {
   return map
 }
 
+function countWords(blocks: Block[]): number {
+  let total = 0
+  const walk = (list: Block[]) => {
+    for (const b of list) {
+      if (b.content && Array.isArray(b.content)) {
+        for (const c of b.content) {
+          if (c.type === 'text') {
+            const words = (c as { type: 'text'; text: string; styles: object }).text
+              .trim().split(/\s+/).filter(Boolean).length
+            total += words
+          }
+        }
+      }
+      if (b.children?.length) walk(b.children)
+    }
+  }
+  walk(blocks)
+  return total
+}
+
 export function BlockNoteEditor({
   docId,
   initialContent,
   onContentChange,
   onBlockChange,
+  onWordCountChange,
   changedBlockIds,
 }: BlockNoteEditorProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -66,11 +88,18 @@ export function BlockNoteEditor({
     snapshotRef.current = buildSnapshot(editor.document)
   }, [editor])
 
+  // Emit initial word count
+  useEffect(() => {
+    if (!editor || !onWordCountChange) return
+    onWordCountChange(countWords(editor.document))
+  }, [editor]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Save content + detect changed blocks (debounced)
   useEffect(() => {
     if (!editor) return
     const unsubscribe = editor.onChange(() => {
       onContentChange(editor.document)
+      onWordCountChange?.(countWords(editor.document))
 
       if (!onBlockChange) return
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current)

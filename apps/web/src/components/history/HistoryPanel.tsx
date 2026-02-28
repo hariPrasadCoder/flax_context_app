@@ -14,14 +14,14 @@ function Snapshot({ before, after }: { before: string | null; after: string }) {
   if (after === '') {
     return (
       <div className="relative pl-3 mt-1">
-        <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-red-300" />
-        <p className="text-[10px] text-red-400 font-medium">Block deleted</p>
+        <div className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full bg-[var(--color-error)]" />
+        <p className="text-[10px] text-[var(--color-error)] font-medium">Block deleted</p>
       </div>
     )
   }
 
   // First version (created)
-  const barColor = !before ? 'bg-green-400' : 'bg-[var(--color-border-strong)]'
+  const barColor = !before ? 'bg-[var(--color-success)]' : 'bg-[var(--color-border-strong)]'
 
   return (
     <div className="relative pl-3 mt-1">

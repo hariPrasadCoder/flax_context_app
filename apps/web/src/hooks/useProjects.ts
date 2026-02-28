@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { useSettingsStore } from '@/stores/settings-store'
 
 interface DocumentRow {
@@ -52,6 +53,9 @@ export function useProjects() {
       const project = await res.json()
       if (!project.error) {
         fetchProjects()
+        toast.success('Project created')
+      } else {
+        toast.error('Failed to create project')
       }
       return project
     },
@@ -69,6 +73,8 @@ export function useProjects() {
       if (!doc.error) {
         fetchProjects()
         router.push(`/docs/${doc.id}`)
+      } else {
+        toast.error('Failed to create document')
       }
       return doc
     },
@@ -79,6 +85,7 @@ export function useProjects() {
     async (projectId: string) => {
       await fetch(`/api/projects/${projectId}`, { method: 'DELETE' })
       fetchProjects()
+      toast.success('Project deleted')
     },
     [fetchProjects]
   )
@@ -87,6 +94,7 @@ export function useProjects() {
     async (docId: string) => {
       await fetch(`/api/documents/${docId}`, { method: 'DELETE' })
       fetchProjects()
+      toast.success('Document deleted')
     },
     [fetchProjects]
   )
