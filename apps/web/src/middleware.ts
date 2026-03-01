@@ -38,23 +38,28 @@ export async function middleware(request: NextRequest) {
   const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p))
   const isApiRoute = pathname.startsWith('/api/')
 
+  // Resolve the public-facing origin from proxy headers (Traefik/Coolify sets these).
+  // Falls back to nextUrl.origin when running locally without a proxy.
+  const getOrigin = () => {
+    const proto = request.headers.get('x-forwarded-proto') ?? request.nextUrl.protocol.replace(':', '')
+    const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? request.nextUrl.host
+    return `${proto}://${host}`
+  }
+
   // Unauthenticated request to a protected route
   if (!user && !isPublic) {
     if (isApiRoute) {
       // API routes must return JSON — never redirect to an HTML page
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth'
+    const url = new URL('/auth', getOrigin())
     url.searchParams.set('next', pathname)
     return NextResponse.redirect(url)
   }
 
   // Redirect authenticated users away from /auth (but not the callback)
   if (user && pathname.startsWith('/auth') && !pathname.startsWith('/auth/callback')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(new URL('/', getOrigin()))
   }
 
   // IMPORTANT: must return supabaseResponse (not a new NextResponse) so that
