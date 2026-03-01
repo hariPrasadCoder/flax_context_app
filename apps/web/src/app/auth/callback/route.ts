@@ -1,12 +1,17 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url)
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl
   const code = searchParams.get('code')
   const next = searchParams.get('next') ?? '/'
   const inviteToken = searchParams.get('invite')
+
+  // Resolve public-facing origin from proxy headers (Coolify/Traefik sets these).
+  const proto = request.headers.get('x-forwarded-proto') ?? 'https'
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? request.nextUrl.host
+  const origin = `${proto}://${host}`
 
   if (!code) {
     return NextResponse.redirect(`${origin}/auth?error=no_code`)
