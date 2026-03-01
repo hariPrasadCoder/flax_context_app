@@ -36,7 +36,7 @@ function AuthPageContent() {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (code.trim().length !== 6) return
+    if (code.trim().length < 6) return
     setLoading(true)
 
     const { error } = await supabase.auth.verifyOtp({
@@ -134,7 +134,7 @@ function AuthPageContent() {
               Check your email
             </h1>
             <p className="text-sm text-[var(--color-text-muted)] mb-8">
-              We sent a 6-digit code to <strong>{email}</strong>
+              We sent a code to <strong>{email}</strong>
             </p>
             <form onSubmit={handleVerifyCode} className="space-y-3">
               <div className="relative">
@@ -142,11 +142,11 @@ function AuthPageContent() {
                 <input
                   type="text"
                   inputMode="numeric"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
+                  pattern="[0-9]{6,8}"
+                  maxLength={8}
                   value={code}
                   onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                  placeholder="000000"
+                  placeholder="00000000"
                   required
                   autoFocus
                   className="w-full h-10 pl-9 pr-4 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] focus:outline-none focus:border-[var(--color-accent)] transition-colors tracking-widest"
@@ -154,7 +154,7 @@ function AuthPageContent() {
               </div>
               <button
                 type="submit"
-                disabled={loading || code.trim().length !== 6}
+                disabled={loading || code.trim().length < 6}
                 className="w-full flex items-center justify-center gap-2 h-10 px-4 rounded-md bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 shadow-[var(--shadow-sm)]"
               >
                 {loading ? (
