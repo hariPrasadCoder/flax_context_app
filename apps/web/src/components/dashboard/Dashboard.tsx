@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Plus, FileText, Clock, ArrowRight, Loader2 } from 'lucide-react'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
 import { formatRelativeTime } from '@/lib/utils'
 import { useState } from 'react'
@@ -27,7 +28,7 @@ function NewProjectModal({ onClose, onCreate }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="bg-[var(--color-surface)] rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6"
+        className="bg-[var(--color-surface)] rounded-lg shadow-[var(--shadow-2xl)] border border-[var(--color-border)] w-full max-w-md mx-4 p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-base font-semibold text-[var(--color-text)] mb-5">New project</h2>
@@ -41,7 +42,7 @@ function NewProjectModal({ onClose, onCreate }: {
                   key={e}
                   type="button"
                   onClick={() => setEmoji(e)}
-                  className={`w-9 h-9 rounded-lg text-lg flex items-center justify-center transition-colors ${emoji === e ? 'bg-[var(--color-accent-subtle)] ring-2 ring-[var(--color-accent)]' : 'bg-[var(--color-sidebar)] hover:bg-[var(--color-sidebar-hover)]'}`}
+                  className={`w-9 h-9 rounded-md text-lg flex items-center justify-center transition-colors ${emoji === e ? 'bg-[var(--color-accent-subtle)] ring-1 ring-[var(--color-accent)]' : 'bg-[var(--color-sidebar)] hover:bg-[var(--color-sidebar-hover)]'}`}
                 >
                   {e}
                 </button>
@@ -56,7 +57,7 @@ function NewProjectModal({ onClose, onCreate }: {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Q2 Roadmap"
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-sidebar)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] outline-none focus:border-[var(--color-accent)] transition-colors"
+              className="w-full px-3 py-2 rounded-md border border-[var(--color-border)] bg-[var(--color-sidebar)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] outline-none focus:border-[var(--color-accent)] transition-colors"
             />
           </div>
 
@@ -67,18 +68,18 @@ function NewProjectModal({ onClose, onCreate }: {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's this project about?"
               rows={2}
-              className="w-full px-3 py-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-sidebar)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] outline-none focus:border-[var(--color-accent)] transition-colors resize-none"
+              className="w-full px-3 py-2 rounded-md border border-[var(--color-border)] bg-[var(--color-sidebar)] text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] outline-none focus:border-[var(--color-accent)] transition-colors resize-none"
             />
           </div>
 
           <div className="flex gap-2 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] transition-colors">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2 rounded-md border border-[var(--color-border)] text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] transition-colors">
               Cancel
             </button>
             <button
               type="submit"
               disabled={!name.trim() || loading}
-              className="flex-1 px-4 py-2 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 rounded-md bg-[var(--color-accent)] text-white text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
               Create project
@@ -128,7 +129,18 @@ export function Dashboard() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-44 rounded-xl bg-[var(--color-sidebar)] border border-[var(--color-border)] animate-pulse" />
+              <div key={i} className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 space-y-4">
+                <div className="flex items-start justify-between">
+                  <Skeleton className="w-10 h-10 rounded-xl" />
+                  <Skeleton className="w-4 h-4 rounded" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-2/3" />
+                </div>
+                <Skeleton className="h-3 w-1/3 mt-2" />
+              </div>
             ))}
           </div>
         ) : (
@@ -139,17 +151,15 @@ export function Dashboard() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {projects.map((project) => {
-                  const firstDoc = project.documents[0]
                   return (
                     <Link
                       key={project.id}
-                      href={firstDoc ? `/docs/${firstDoc.id}` : '#'}
-                      className="group block bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-border-strong)] hover:shadow-sm transition-all duration-150"
+                      href={`/projects/${project.id}`}
+                      className="group block bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg p-5 hover:border-[var(--color-border-strong)] hover:shadow-[var(--shadow)] transition-all duration-150"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div
-                          className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
-                          style={{ backgroundColor: `${project.color}18` }}
+                          className="w-10 h-10 rounded-md flex items-center justify-center text-xl shrink-0 bg-[var(--color-sidebar)]"
                         >
                           {project.emoji}
                         </div>
@@ -174,9 +184,9 @@ export function Dashboard() {
                 {/* New project card */}
                 <button
                   onClick={() => setShowNewProject(true)}
-                  className="group flex flex-col items-center justify-center gap-2 bg-[var(--color-surface)] border border-dashed border-[var(--color-border)] rounded-xl p-5 hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-subtle)] transition-all duration-150 min-h-[160px]"
+                  className="group flex flex-col items-center justify-center gap-2 bg-[var(--color-surface)] border border-dashed border-[var(--color-border)] rounded-lg p-5 hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-subtle)] transition-all duration-150 min-h-[160px]"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-border)] group-hover:bg-white flex items-center justify-center transition-colors">
+                  <div className="w-10 h-10 rounded-md bg-[var(--color-border)] group-hover:bg-[var(--color-surface)] flex items-center justify-center transition-colors">
                     <Plus className="w-5 h-5 text-[var(--color-text-faint)] group-hover:text-[var(--color-accent)]" />
                   </div>
                   <span className="text-sm text-[var(--color-text-faint)] group-hover:text-[var(--color-accent)] font-medium transition-colors">
@@ -200,8 +210,7 @@ export function Dashboard() {
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-[var(--color-sidebar-hover)] transition-colors group"
                     >
                       <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-sm shrink-0"
-                        style={{ backgroundColor: `${project.color}18` }}
+                        className="w-7 h-7 rounded-md flex items-center justify-center text-sm shrink-0 bg-[var(--color-sidebar)]"
                       >
                         {project.emoji}
                       </div>

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { useSettingsStore } from '@/stores/settings-store'
 
 interface DocumentRow {
   id: string
@@ -17,6 +19,7 @@ interface ProjectRow {
   description: string | null
   emoji: string
   color: string
+  visibility: string
   created_at: string
   updated_at: string
   documents: DocumentRow[]
@@ -26,6 +29,7 @@ export function useProjects() {
   const [projects, setProjects] = useState<ProjectRow[]>([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
+  const defaultDocStatus = useSettingsStore((s) => s.defaultDocStatus)
 
   const fetchProjects = useCallback(() => {
     fetch('/api/projects')
@@ -50,6 +54,9 @@ export function useProjects() {
       const project = await res.json()
       if (!project.error) {
         fetchProjects()
+        toast.success('Project created')
+      } else {
+        toast.error('Failed to create project')
       }
       return project
     },
@@ -61,17 +68,53 @@ export function useProjects() {
       const res = await fetch(`/api/projects/${projectId}/documents`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, status: defaultDocStatus }),
       })
       const doc = await res.json()
       if (!doc.error) {
         fetchProjects()
         router.push(`/docs/${doc.id}`)
+      } else {
+        toast.error('Failed to create document')
       }
       return doc
     },
     [fetchProjects, router]
   )
 
-  return { projects, loading, createProject, createDocument, refetch: fetchProjects }
+  const deleteProject = useCallback(
+    async (projectId: string) => {
+      await fetch(`/api/projects/${projectId}`, { method: 'DELETE' })
+      fetchProjects()
+      toast.success('Project deleted')
+    },
+    [fetchProjects]
+  )
+
+  const deleteDocument = useCallback(
+    async (docId: string) => {
+      await fetch(`/api/documents/${docId}`, { method: 'DELETE' })
+      fetchProjects()
+      toast.success('Document deleted')
+    },
+    [fetchProjects]
+  )
+
+  const updateProject = useCallback(
+    async (projectId: string, updates: Partial<Pick<ProjectRow, 'name' | 'description' | 'emoji' | 'color' | 'visibility'>>) => {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      const data = await res.json()
+      if (!data.error) {
+        setProjects((prev) => prev.map((p) => p.id === projectId ? { ...p, ...updates } : p))
+      }
+      return data
+    },
+    []
+  )
+
+  return { projects, loading, createProject, createDocument, deleteProject, deleteDocument, updateProject, refetch: fetchProjects }
 }

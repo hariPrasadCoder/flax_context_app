@@ -5,9 +5,14 @@ import { create } from 'zustand'
 interface EditorStore {
   // History panel
   historyPanelOpen: boolean
-  activeBlockId: string | null   // block whose history we're viewing
+  activeBlockId: string | null
   openHistoryPanel: (blockId?: string) => void
   closeHistoryPanel: () => void
+
+  // Proposals panel
+  proposalsPanelOpen: boolean
+  openProposalsPanel: () => void
+  closeProposalsPanel: () => void
 
   // Sidebar
   sidebarCollapsed: boolean
@@ -19,10 +24,18 @@ export const useEditorStore = create<EditorStore>((set) => ({
   activeBlockId: null,
 
   openHistoryPanel: (blockId) =>
-    set({ historyPanelOpen: true, activeBlockId: blockId ?? null }),
+    set({ historyPanelOpen: true, proposalsPanelOpen: false, activeBlockId: blockId ?? null }),
 
   closeHistoryPanel: () =>
     set({ historyPanelOpen: false, activeBlockId: null }),
+
+  proposalsPanelOpen: false,
+
+  openProposalsPanel: () =>
+    set({ proposalsPanelOpen: true, historyPanelOpen: false, activeBlockId: null }),
+
+  closeProposalsPanel: () =>
+    set({ proposalsPanelOpen: false }),
 
   sidebarCollapsed: false,
   toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),

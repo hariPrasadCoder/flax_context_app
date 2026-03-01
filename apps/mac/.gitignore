@@ -1,0 +1,12 @@
+# Swift Package Manager build output
+.build/
+
+# SPM auto-generated Xcode workspace (not needed alongside our hand-crafted xcodeproj)
+.swiftpm/
+
+# Xcode per-user data (breakpoints, window layout, derived settings)
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS metadata
+.DS_Store

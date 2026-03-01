@@ -10,13 +10,16 @@ import {
 import { BlockNoteView } from '@blocknote/mantine'
 import '@blocknote/mantine/style.css'
 import { useEditorStore } from '@/stores/editor-store'
+import { useSettingsStore } from '@/stores/settings-store'
 
 interface BlockNoteEditorProps {
   docId: string
   initialContent: unknown
   onContentChange: (content: unknown) => void
   onBlockChange?: (blockId: string, before: string, after: string) => void
+  onWordCountChange?: (count: number) => void
   changedBlockIds: Set<string>
+  editable?: boolean
 }
 
 /** Extract plain text from a BlockNote block */
@@ -41,18 +44,41 @@ function buildSnapshot(blocks: Block[]): Map<string, string> {
   return map
 }
 
+function countWords(blocks: Block[]): number {
+  let total = 0
+  const walk = (list: Block[]) => {
+    for (const b of list) {
+      if (b.content && Array.isArray(b.content)) {
+        for (const c of b.content) {
+          if (c.type === 'text') {
+            const words = (c as { type: 'text'; text: string; styles: object }).text
+              .trim().split(/\s+/).filter(Boolean).length
+            total += words
+          }
+        }
+      }
+      if (b.children?.length) walk(b.children)
+    }
+  }
+  walk(blocks)
+  return total
+}
+
 export function BlockNoteEditor({
   docId,
   initialContent,
   onContentChange,
   onBlockChange,
+  onWordCountChange,
   changedBlockIds,
+  editable = true,
 }: BlockNoteEditorProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const snapshotRef = useRef<Map<string, string>>(new Map())
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const prevHoveredRef = useRef<string | null>(null)
-  const { openHistoryPanel, historyPanelOpen } = useEditorStore()
+  const { openHistoryPanel } = useEditorStore()
+  const isDark = useSettingsStore((s) => s.theme === 'dark')
 
   const editor = useCreateBlockNote({
     ...(initialContent ? { initialContent: initialContent as PartialBlock[] } : {}),
@@ -64,11 +90,18 @@ export function BlockNoteEditor({
     snapshotRef.current = buildSnapshot(editor.document)
   }, [editor])
 
+  // Emit initial word count
+  useEffect(() => {
+    if (!editor || !onWordCountChange) return
+    onWordCountChange(countWords(editor.document))
+  }, [editor]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Save content + detect changed blocks (debounced)
   useEffect(() => {
     if (!editor) return
     const unsubscribe = editor.onChange(() => {
       onContentChange(editor.document)
+      onWordCountChange?.(countWords(editor.document))
 
       if (!onBlockChange) return
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
@@ -104,25 +137,33 @@ export function BlockNoteEditor({
   }, [editor, onContentChange, onBlockChange])
 
   // Amber left-border stripe on blocks with history.
-  // Uses box-shadow so it doesn't affect layout or conflict with BlockNote's
-  // own drag-handle / plus-button that live in the same left gutter.
+  // Applied to .bn-block-content with padding-left so there's breathing room
+  // between the stripe and the text (like a diff/blockquote indicator).
   const changedBlockCSS = Array.from(changedBlockIds)
     .map(
       (id) => `
       .flax-blocknote [data-id="${id}"] > .bn-block {
-        box-shadow: -3px 0 0 0 var(--color-changed);
-        border-radius: 0 4px 4px 0;
-        transition: box-shadow 0.15s;
+        position: relative;
+      }
+      .flax-blocknote [data-id="${id}"] > .bn-block::before {
+        content: '';
+        position: absolute;
+        left: -20px;
+        top: 2px;
+        bottom: 2px;
+        width: 3px;
+        background-color: var(--color-changed);
+        border-radius: 2px;
+        transition: opacity 0.15s;
       }
       .flax-blocknote [data-id="${id}"]:hover > .bn-block {
-        box-shadow: -4px 0 0 0 var(--color-changed);
-        background-color: color-mix(in oklch, var(--color-changed) 5%, transparent);
+        background-color: color-mix(in srgb, var(--color-changed) 6%, transparent);
       }
     `
     )
     .join('\n')
 
-  // Hover detection — mousemove on the editor wrapper
+  // Hover detection — open history panel when hovering a changed block
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
       const el = (e.target as Element).closest('[data-id]')
@@ -163,7 +204,7 @@ export function BlockNoteEditor({
         <style dangerouslySetInnerHTML={{ __html: changedBlockCSS }} />
       )}
 
-      <BlockNoteView editor={editor} theme="light" slashMenu={false}>
+      <BlockNoteView editor={editor} theme={isDark ? 'dark' : 'light'} slashMenu={false} editable={editable}>
         <SuggestionMenuController
           triggerCharacter="/"
           getItems={getSlashMenuItems}

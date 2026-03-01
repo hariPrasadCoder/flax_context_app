@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Flax</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Flax</string>
+
+    <key>CFBundleIdentifier</key>
+    <string>com.flax.mac</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <!-- Privacy usage descriptions -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Flax records your microphone to transcribe meetings locally on your device.</string>
+
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>Flax captures system audio from meetings (Zoom, Meet, Slack) to include remote participants in transcripts. No screen pixels are recorded.</string>
+
+    <key>NSCalendarsUsageDescription</key>
+    <string>Flax reads your calendar to detect when meetings are starting and offer to record them automatically.</string>
+
+    <!-- Minimum OS -->
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+</dict>
+</plist>
