@@ -17,6 +17,7 @@ interface EditorCanvasProps {
   onBlockChange: (blockId: string, before: string, after: string) => void
   onTitleChange: (title: string) => Promise<void>
   changedBlockIds: Set<string>
+  readOnly?: boolean
 }
 
 export function EditorCanvas({
@@ -27,6 +28,7 @@ export function EditorCanvas({
   onBlockChange,
   onTitleChange,
   changedBlockIds,
+  readOnly = false,
 }: EditorCanvasProps) {
   const [localTitle, setLocalTitle] = useState(title)
   const [wordCount, setWordCount] = useState(0)
@@ -53,14 +55,14 @@ export function EditorCanvas({
         {/* Document title */}
         <textarea
           value={localTitle}
-          onChange={(e) => {
+          onChange={readOnly ? undefined : (e) => {
             setLocalTitle(e.target.value)
-            // Auto-resize
             e.target.style.height = 'auto'
             e.target.style.height = e.target.scrollHeight + 'px'
           }}
-          onBlur={handleTitleBlur}
-          onKeyDown={handleTitleKeyDown}
+          onBlur={readOnly ? undefined : handleTitleBlur}
+          onKeyDown={readOnly ? undefined : handleTitleKeyDown}
+          readOnly={readOnly}
           placeholder="Untitled"
           rows={1}
           className="w-full resize-none overflow-hidden bg-transparent border-none outline-none text-[var(--color-text)] placeholder:text-[var(--color-text-faint)] mb-8"
@@ -70,6 +72,7 @@ export function EditorCanvas({
             fontWeight: 700,
             lineHeight: 1.2,
             letterSpacing: '-0.02em',
+            cursor: readOnly ? 'default' : undefined,
           }}
         />
 
@@ -80,6 +83,7 @@ export function EditorCanvas({
           onBlockChange={onBlockChange}
           onWordCountChange={setWordCount}
           changedBlockIds={changedBlockIds}
+          editable={!readOnly}
         />
       </div>
 

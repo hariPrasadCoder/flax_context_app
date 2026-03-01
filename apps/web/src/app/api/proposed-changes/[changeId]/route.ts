@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { createSupabaseServer, createServiceClient } from '@/lib/supabase-server'
 import { updateBlockInContent } from '@/lib/blocknote-utils'
 
 interface Params {
@@ -15,6 +15,11 @@ export async function PATCH(req: Request, { params }: Params) {
     return NextResponse.json({ error: 'action must be accept or reject' }, { status: 400 })
   }
 
+  const authDb = await createSupabaseServer()
+  const { data: { user } } = await authDb.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  // Use service client for the multi-step accept operation (atomic update across tables)
   const db = createServiceClient()
 
   // Fetch the change + its meeting title

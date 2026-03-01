@@ -13,7 +13,9 @@ import {
   Zap,
   Link2,
   FileDown,
+  Users,
 } from 'lucide-react'
+import { ShareModal } from './ShareModal'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { useEditorStore } from '@/stores/editor-store'
@@ -29,6 +31,11 @@ interface EditorHeaderProps {
   onPublish?: () => Promise<void>
   docContent?: unknown
   docTitle?: string
+  visibility?: string
+  projectVisibility?: string
+  orgId?: string
+  onVisibilityChange?: (v: string) => void
+  readOnly?: boolean
 }
 
 // ── Simple markdown export ────────────────────────────────────────────────────
@@ -156,6 +163,11 @@ export function EditorHeader({
   onPublish,
   docContent,
   docTitle,
+  visibility = 'workspace',
+  projectVisibility = 'workspace',
+  orgId,
+  onVisibilityChange,
+  readOnly = false,
 }: EditorHeaderProps) {
   const router = useRouter()
   const {
@@ -164,6 +176,7 @@ export function EditorHeader({
   } = useEditorStore()
   const { projects } = useProjects()
   const [publishing, setPublishing] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
 
   const project = projects.find((p) => p.id === projectId)
 
@@ -199,18 +212,24 @@ export function EditorHeader({
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Save status */}
-      <div className={cn(
-        'flex items-center gap-1 text-xs shrink-0 transition-all duration-200',
-        saving ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-faint)] opacity-50'
-      )}>
-        {saving
-          ? <><Loader2 className="w-3 h-3 animate-spin" /><span>Saving</span></>
-          : <><Check className="w-3 h-3" /><span>Saved</span></>
-        }
-      </div>
+      {/* Save status / view-only badge */}
+      {readOnly ? (
+        <span className="flex items-center gap-1 text-xs px-2 py-0.5 rounded border border-[var(--color-border)] text-[var(--color-text-faint)] bg-[var(--color-sidebar)] shrink-0 select-none">
+          View only
+        </span>
+      ) : (
+        <div className={cn(
+          'flex items-center gap-1 text-xs shrink-0 transition-all duration-200',
+          saving ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-faint)] opacity-50'
+        )}>
+          {saving
+            ? <><Loader2 className="w-3 h-3 animate-spin" /><span>Saving</span></>
+            : <><Check className="w-3 h-3" /><span>Saved</span></>
+          }
+        </div>
+      )}
 
-      {status === 'draft' ? (
+      {!readOnly && status === 'draft' ? (
         /* Draft mode — Publish CTA */
         <button
           onClick={async () => {
@@ -225,7 +244,7 @@ export function EditorHeader({
           {publishing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
           <span>Publish</span>
         </button>
-      ) : (
+      ) : !readOnly ? (
         /* Published mode — AI suggestions + History */
         <>
           {pendingCount > 0 && (
@@ -259,9 +278,35 @@ export function EditorHeader({
             )}
           </button>
         </>
+      ) : null}
+
+      {/* Share button */}
+      {orgId && (
+        <button
+          onClick={() => setShareOpen(true)}
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors shrink-0 text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]"
+          title="Share & access"
+        >
+          <Users className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline text-xs">Share</span>
+        </button>
       )}
 
       <MoreMenu docId={docId} docTitle={docTitle} docContent={docContent} />
+
+      {/* Share modal */}
+      {orgId && (
+        <ShareModal
+          docId={docId}
+          orgId={orgId}
+          projectId={projectId}
+          projectVisibility={projectVisibility}
+          initialVisibility={visibility}
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          onVisibilityChange={(v) => { onVisibilityChange?.(v) }}
+        />
+      )}
     </header>
   )
 }

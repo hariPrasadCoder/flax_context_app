@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase'
+import { createSupabaseServer } from '@/lib/supabase-server'
 
 // GET /api/proposed-changes?docId=xxx[&status=pending]
 export async function GET(req: Request) {
@@ -9,7 +9,9 @@ export async function GET(req: Request) {
 
   if (!docId) return NextResponse.json({ error: 'docId required' }, { status: 400 })
 
-  const db = createServiceClient()
+  const db = await createSupabaseServer()
+  const { data: { user } } = await db.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data, error } = await db
     .from('proposed_changes')

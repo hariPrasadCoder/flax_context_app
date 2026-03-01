@@ -19,6 +19,7 @@ interface ProjectRow {
   description: string | null
   emoji: string
   color: string
+  visibility: string
   created_at: string
   updated_at: string
   documents: DocumentRow[]
@@ -99,5 +100,21 @@ export function useProjects() {
     [fetchProjects]
   )
 
-  return { projects, loading, createProject, createDocument, deleteProject, deleteDocument, refetch: fetchProjects }
+  const updateProject = useCallback(
+    async (projectId: string, updates: Partial<Pick<ProjectRow, 'name' | 'description' | 'emoji' | 'color' | 'visibility'>>) => {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      })
+      const data = await res.json()
+      if (!data.error) {
+        setProjects((prev) => prev.map((p) => p.id === projectId ? { ...p, ...updates } : p))
+      }
+      return data
+    },
+    []
+  )
+
+  return { projects, loading, createProject, createDocument, deleteProject, deleteDocument, updateProject, refetch: fetchProjects }
 }

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { createServiceClient } from '@/lib/supabase'
+import { createSupabaseServer, createServiceClient } from '@/lib/supabase-server'
 import { extractBlocksWithIds } from '@/lib/blocknote-utils'
 
 interface Params {
@@ -9,6 +9,10 @@ interface Params {
 
 export async function GET(_req: Request, { params }: Params) {
   const { projectId } = await params
+  const authDb = await createSupabaseServer()
+  const { data: { user } } = await authDb.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Use service client for the actual query (AI pipeline needs unrestricted doc access)
   const db = createServiceClient()
 
   const { data, error } = await db
@@ -23,6 +27,9 @@ export async function GET(_req: Request, { params }: Params) {
 
 export async function POST(req: Request, { params }: Params) {
   const { projectId } = await params
+  const authDb = await createSupabaseServer()
+  const { data: { user } } = await authDb.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const db = createServiceClient()
   const { title, transcript, model } = await req.json()
 

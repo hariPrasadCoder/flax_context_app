@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Merriweather, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { Toaster } from "sonner";
+import { AuthProvider } from "@/providers/AuthProvider";
 import "./globals.css";
 
 const merriweather = Merriweather({
@@ -37,7 +38,9 @@ export default function RootLayout({
         className={`${merriweather.variable} ${ibmPlexSans.variable} ${ibmPlexMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <Toaster
           position="bottom-right"
           toastOptions={{

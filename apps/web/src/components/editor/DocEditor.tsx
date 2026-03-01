@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useDocument } from '@/hooks/useDocument'
@@ -10,6 +10,7 @@ import { HistoryPanel } from '@/components/history/HistoryPanel'
 import { ProposedChangesPanel } from './ProposedChangesPanel'
 import { useBlockHistory } from '@/hooks/useBlockHistory'
 import { useProposedChanges } from '@/hooks/useProposedChanges'
+import { useAuth } from '@/providers/AuthProvider'
 
 interface DocEditorProps {
   docId: string
@@ -20,6 +21,13 @@ export function DocEditor({ docId }: DocEditorProps) {
   const { authorName, authorColor } = useSettingsStore()
   const { history, changedBlockIds, historyByBlock, addEntry, refetch: refetchHistory } = useBlockHistory(docId)
   const { pendingCount, refetch: refetchProposals } = useProposedChanges(docId)
+  const { org } = useAuth()
+  const [docVisibility, setDocVisibility] = useState<string>('workspace')
+
+  // Sync visibility from loaded doc
+  useEffect(() => {
+    if (doc?.visibility) setDocVisibility(doc.visibility)
+  }, [doc?.visibility])
 
   // Use a ref so handleBlockChange stays stable and never causes
   // BlockNoteEditor to tear down + re-register its editor.onChange listener.
@@ -109,6 +117,11 @@ export function DocEditor({ docId }: DocEditorProps) {
         onPublish={publishDoc}
         docContent={doc.content}
         docTitle={doc.title}
+        visibility={docVisibility}
+        projectVisibility={doc.project_visibility}
+        orgId={org?.id}
+        onVisibilityChange={setDocVisibility}
+        readOnly={doc.user_role === 'viewer'}
       />
       <div className="flex flex-1 overflow-hidden">
         <EditorCanvas
@@ -119,6 +132,7 @@ export function DocEditor({ docId }: DocEditorProps) {
           onBlockChange={handleBlockChange}
           onTitleChange={saveTitle}
           changedBlockIds={changedBlockIds}
+          readOnly={doc.user_role === 'viewer'}
         />
         <HistoryPanel historyByBlock={historyByBlock} />
         <ProposedChangesPanel docId={docId} onAccepted={handleProposalAccepted} />

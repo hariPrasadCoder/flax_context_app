@@ -19,6 +19,7 @@ interface BlockNoteEditorProps {
   onBlockChange?: (blockId: string, before: string, after: string) => void
   onWordCountChange?: (count: number) => void
   changedBlockIds: Set<string>
+  editable?: boolean
 }
 
 /** Extract plain text from a BlockNote block */
@@ -70,6 +71,7 @@ export function BlockNoteEditor({
   onBlockChange,
   onWordCountChange,
   changedBlockIds,
+  editable = true,
 }: BlockNoteEditorProps) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const snapshotRef = useRef<Map<string, string>>(new Map())
@@ -202,7 +204,7 @@ export function BlockNoteEditor({
         <style dangerouslySetInnerHTML={{ __html: changedBlockCSS }} />
       )}
 
-      <BlockNoteView editor={editor} theme={isDark ? 'dark' : 'light'} slashMenu={false}>
+      <BlockNoteView editor={editor} theme={isDark ? 'dark' : 'light'} slashMenu={false} editable={editable}>
         <SuggestionMenuController
           triggerCharacter="/"
           getItems={getSlashMenuItems}

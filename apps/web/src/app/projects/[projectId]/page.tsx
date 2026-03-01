@@ -2,14 +2,272 @@
 
 import { use, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays, ChevronDown, ChevronRight as ChevronRightIcon } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays, ChevronDown, ChevronRight as ChevronRightIcon, Globe, Lock, EyeOff, UserRound, Users } from 'lucide-react'
 import { AppShell } from '@/components/layout/AppShell'
 import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
+import { useAuth } from '@/providers/AuthProvider'
 import { formatRelativeTime, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
+
+// ── Project access section ───────────────────────────────────────────────────────
+
+const VISIBILITY_OPTIONS = [
+  { value: 'workspace', icon: Globe,   label: 'Workspace', desc: 'All workspace members' },
+  { value: 'restricted', icon: Lock,   label: 'Restricted', desc: 'Specific people only' },
+  { value: 'private',   icon: EyeOff,  label: 'Private',    desc: 'Only you' },
+]
+
+interface ProjectMember {
+  userId: string
+  role: 'editor' | 'viewer'
+  displayName: string | null
+  avatarUrl: string | null
+}
+
+interface OrgMemberRow {
+  user_id: string
+  role: string
+  display_name: string | null
+  avatar_url: string | null
+}
+
+function MemberAvatar({ name, url }: { name: string | null; url: string | null }) {
+  const initials = (name ?? '?').split(' ').map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+  if (url) return <img src={url} alt={name ?? ''} className="w-7 h-7 rounded-full object-cover shrink-0" />
+  return (
+    <div className="w-7 h-7 rounded-full bg-[var(--color-accent)] text-white text-[10px] font-semibold flex items-center justify-center shrink-0">
+      {initials}
+    </div>
+  )
+}
+
+function ProjectAccessSection({
+  projectId,
+  orgId,
+  initialVisibility,
+  onVisibilityChange,
+}: {
+  projectId: string
+  orgId: string
+  initialVisibility: string
+  onVisibilityChange: (v: string) => void
+}) {
+  const [visibility, setVisibility] = useState(initialVisibility)
+  const [members, setMembers] = useState<ProjectMember[]>([])
+  const [orgMembers, setOrgMembers] = useState<OrgMemberRow[]>([])
+  const [loadingMembers, setLoadingMembers] = useState(false)
+  const [savingVisibility, setSavingVisibility] = useState(false)
+  const [addUserId, setAddUserId] = useState('')
+  const [addRole, setAddRole] = useState<'editor' | 'viewer'>('editor')
+  const [addingMember, setAddingMember] = useState(false)
+
+  useEffect(() => { setVisibility(initialVisibility) }, [initialVisibility])
+
+  const loadMembers = useCallback(async () => {
+    setLoadingMembers(true)
+    try {
+      const [membersRes, orgRes] = await Promise.all([
+        fetch(`/api/projects/${projectId}/members`),
+        fetch(`/api/orgs/${orgId}/members`),
+      ])
+      const [membersData, orgData] = await Promise.all([membersRes.json(), orgRes.json()])
+      if (!membersData.error) setMembers(membersData)
+      if (!orgData.error) setOrgMembers(orgData)
+    } finally {
+      setLoadingMembers(false)
+    }
+  }, [projectId, orgId])
+
+  useEffect(() => {
+    if (visibility === 'restricted') loadMembers()
+  }, [visibility, loadMembers])
+
+  const handleVisibilityChange = async (newVis: string) => {
+    if (newVis === visibility || savingVisibility) return
+    setSavingVisibility(true)
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visibility: newVis }),
+      })
+      const data = await res.json()
+      if (data.error) { toast.error('Failed to update access'); return }
+      setVisibility(newVis)
+      onVisibilityChange(newVis)
+      if (newVis === 'restricted') loadMembers()
+    } catch {
+      toast.error('Failed to update access')
+    } finally {
+      setSavingVisibility(false)
+    }
+  }
+
+  const handleAddMember = async () => {
+    if (!addUserId || addingMember) return
+    setAddingMember(true)
+    try {
+      const res = await fetch(`/api/projects/${projectId}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: addUserId, role: addRole }),
+      })
+      const data = await res.json()
+      if (data.error) { toast.error('Failed to add member'); return }
+      toast.success('Member added')
+      setAddUserId('')
+      await loadMembers()
+    } catch {
+      toast.error('Failed to add member')
+    } finally {
+      setAddingMember(false)
+    }
+  }
+
+  const handleRemoveMember = async (userId: string) => {
+    try {
+      const res = await fetch(`/api/projects/${projectId}/members?userId=${userId}`, { method: 'DELETE' })
+      if (!res.ok) { toast.error('Failed to remove member'); return }
+      setMembers((prev) => prev.filter((m) => m.userId !== userId))
+      toast.success('Member removed')
+    } catch {
+      toast.error('Failed to remove member')
+    }
+  }
+
+  const addedUserIds = new Set(members.map((m) => m.userId))
+  const availableToAdd = orgMembers.filter((m) => !addedUserIds.has(m.user_id))
+
+  return (
+    <div className="space-y-4">
+      {/* Visibility picker */}
+      <div>
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)] mb-2">
+          Who can access
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {VISIBILITY_OPTIONS.map((opt) => {
+            const Icon = opt.icon
+            const active = visibility === opt.value
+            return (
+              <button
+                key={opt.value}
+                onClick={() => handleVisibilityChange(opt.value)}
+                disabled={savingVisibility}
+                className={cn(
+                  'flex flex-col items-center gap-1.5 p-3 rounded border text-center transition-all disabled:opacity-60',
+                  active
+                    ? 'border-[var(--color-accent)] bg-[var(--color-accent-subtle)] text-[var(--color-accent)]'
+                    : 'border-[var(--color-border)] text-[var(--color-text-muted)] hover:border-[var(--color-accent)] hover:text-[var(--color-text)] hover:bg-[var(--color-sidebar-hover)]'
+                )}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="text-xs font-medium leading-none">{opt.label}</span>
+                <span className="text-[10px] leading-snug opacity-70">{opt.desc}</span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Access details */}
+      {visibility === 'workspace' && (
+        <div className="flex items-center gap-2.5 py-2 px-3 rounded border border-[var(--color-border)] bg-[var(--color-sidebar)]">
+          <Globe className="w-4 h-4 text-[var(--color-text-faint)] shrink-0" />
+          <p className="text-sm text-[var(--color-text-muted)]">All workspace members can view and edit this project and its documents.</p>
+        </div>
+      )}
+
+      {visibility === 'private' && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2.5 py-2 px-3 rounded border border-[var(--color-border)] bg-[var(--color-sidebar)]">
+            <EyeOff className="w-4 h-4 text-[var(--color-text-faint)] shrink-0" />
+            <p className="text-sm text-[var(--color-text-muted)]">Only you can access this project.</p>
+          </div>
+          <p className="text-xs text-[var(--color-text-faint)] px-1">
+            All documents inside are also private. Document-level sharing is disabled.
+          </p>
+        </div>
+      )}
+
+      {visibility === 'restricted' && (
+        <div className="space-y-2">
+          <p className="text-xs text-[var(--color-text-faint)] px-1">
+            Only the people below can access this project and all its documents. Document-level sharing is disabled — to share a document, add the person here.
+          </p>
+          {/* Current members */}
+          {loadingMembers ? (
+            <p className="text-sm text-[var(--color-text-faint)] py-1">Loading…</p>
+          ) : members.length > 0 ? (
+            <ul className="divide-y divide-[var(--color-border)] border border-[var(--color-border)] rounded-md overflow-hidden">
+              {members.map((m) => (
+                <li key={m.userId} className="flex items-center gap-2.5 px-3 py-2.5 bg-[var(--color-surface)]">
+                  <MemberAvatar name={m.displayName} url={m.avatarUrl} />
+                  <span className="flex-1 text-sm text-[var(--color-text)] truncate">
+                    {m.displayName ?? 'Unknown'}
+                  </span>
+                  <span className="text-[10px] text-[var(--color-text-faint)] border border-[var(--color-border)] rounded px-1.5 py-0.5 font-mono shrink-0">
+                    {m.role}
+                  </span>
+                  <button
+                    onClick={() => handleRemoveMember(m.userId)}
+                    className="text-[var(--color-text-faint)] hover:text-[var(--color-error)] transition-colors shrink-0"
+                    title="Remove member"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {/* Add member — always shown when restricted and not loading */}
+          {!loadingMembers && (
+            <div className="flex items-center gap-1.5 pt-1">
+              <div className="relative flex-1 min-w-0">
+                <UserRound className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[var(--color-text-faint)] pointer-events-none" />
+                <select
+                  value={addUserId}
+                  onChange={(e) => setAddUserId(e.target.value)}
+                  className="w-full pl-7 pr-2 py-1.5 text-sm bg-[var(--color-surface)] border border-[var(--color-border)] rounded text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)] appearance-none"
+                >
+                  <option value="">
+                    {availableToAdd.length === 0 ? 'All workspace members added' : 'Add person…'}
+                  </option>
+                  {availableToAdd.map((m) => (
+                    <option key={m.user_id} value={m.user_id}>
+                      {m.display_name ?? m.user_id.slice(0, 8)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <select
+                value={addRole}
+                onChange={(e) => setAddRole(e.target.value as 'editor' | 'viewer')}
+                className="text-sm bg-[var(--color-surface)] border border-[var(--color-border)] rounded px-2 py-1.5 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-accent)]"
+              >
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
+              </select>
+              <button
+                onClick={handleAddMember}
+                disabled={!addUserId || addingMember || availableToAdd.length === 0}
+                className="flex items-center justify-center w-8 h-8 rounded bg-[var(--color-accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-40 shrink-0"
+                title="Add member"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── Meeting import modal ────────────────────────────────────────────────────────
 
@@ -141,8 +399,12 @@ type Tab = 'docs' | 'meetings' | 'manage'
 export default function ProjectPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = use(params)
   const { projects, loading, createDocument, deleteProject, deleteDocument } = useProjects()
+  const { org } = useAuth()
   const router = useRouter()
-  const [tab, setTab] = useState<Tab>('docs')
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get('tab') as Tab | null) ?? 'docs'
+  const [tab, setTab] = useState<Tab>(initialTab)
+  const [projectVisibility, setProjectVisibility] = useState<string>('workspace')
   const [creating, setCreating] = useState(false)
   const [showMeetingModal, setShowMeetingModal] = useState(false)
   const [meetings, setMeetings] = useState<Array<{ id: string; title: string; transcript: string; created_at: string }>>([])
@@ -152,6 +414,11 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
   const [deletingProject, setDeletingProject] = useState(false)
 
   const project = projects.find((p) => p.id === projectId)
+
+  // Sync visibility from loaded project
+  useEffect(() => {
+    if (project?.visibility) setProjectVisibility(project.visibility)
+  }, [project?.visibility])
 
   const fetchMeetings = useCallback(async () => {
     const res = await fetch(`/api/projects/${projectId}/meetings`)
@@ -410,6 +677,23 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
           {/* Tab: Manage */}
           {tab === 'manage' && (
             <div className="space-y-6">
+
+              {/* Visibility & access */}
+              {org && (
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-faint)] mb-3 flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5" />
+                    Visibility &amp; access
+                  </h3>
+                  <ProjectAccessSection
+                    projectId={projectId}
+                    orgId={org.id}
+                    initialVisibility={projectVisibility}
+                    onVisibilityChange={setProjectVisibility}
+                  />
+                </div>
+              )}
+
               {/* Delete documents */}
               {project.documents.length > 0 && (
                 <div>

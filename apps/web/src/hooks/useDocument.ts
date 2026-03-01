@@ -11,6 +11,9 @@ interface DocumentData {
   project_id: string
   updated_at: string
   status: 'draft' | 'published'
+  visibility: string
+  project_visibility: string  // workspace | restricted | private — the project's ceiling
+  user_role: string           // 'editor' | 'viewer'
 }
 
 export function useDocument(docId: string) {

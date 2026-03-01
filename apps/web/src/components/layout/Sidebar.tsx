@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   ChevronDown,
   ChevronRight,
@@ -12,10 +12,13 @@ import {
   Zap,
   Plus,
   Search,
+  LogOut,
+  ChevronsUpDown,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
+import { useAuth } from '@/providers/AuthProvider'
 
 interface DocumentRow {
   id: string
@@ -122,6 +125,76 @@ function ProjectItem({
   )
 }
 
+// ── User menu ──────────────────────────────────────────────────────────────────
+function UserMenu() {
+  const { user, org, member, signOut } = useAuth()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [open])
+
+  const displayName = member?.display_name ?? user?.email ?? 'You'
+  const initials = displayName
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-[var(--color-sidebar-hover)] transition-colors group"
+      >
+        {/* Avatar */}
+        {member?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={member.avatar_url}
+            alt={displayName}
+            className="w-6 h-6 rounded-full shrink-0 object-cover"
+          />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-[var(--color-accent)] text-white text-[10px] font-semibold flex items-center justify-center shrink-0">
+            {initials}
+          </div>
+        )}
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-xs font-medium text-[var(--color-text)] truncate leading-tight">{displayName}</p>
+          {org && (
+            <p className="text-[10px] text-[var(--color-text-faint)] truncate leading-tight">{org.name}</p>
+          )}
+        </div>
+        <ChevronsUpDown className="w-3 h-3 text-[var(--color-text-faint)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+      </button>
+
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-md shadow-[var(--shadow-lg)] py-1 z-50">
+          <div className="px-3 py-2 border-b border-[var(--color-border)] mb-1">
+            <p className="text-xs font-medium text-[var(--color-text)] truncate">{displayName}</p>
+            <p className="text-[10px] text-[var(--color-text-faint)] truncate">{user?.email}</p>
+          </div>
+          <button
+            onClick={() => { setOpen(false); signOut() }}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-error)] transition-colors text-left"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function Sidebar({ onSearch }: { onSearch?: () => void }) {
   const { projects, loading, createProject, createDocument } = useProjects()
   const pathname = usePathname()
@@ -212,6 +285,11 @@ export function Sidebar({ onSearch }: { onSearch?: () => void }) {
           <Settings className="w-4 h-4" />
           <span>Settings</span>
         </Link>
+
+        {/* User / org */}
+        <div className="pt-1 border-t border-[var(--color-border)] mt-1">
+          <UserMenu />
+        </div>
       </div>
     </aside>
   )
