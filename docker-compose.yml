@@ -19,3 +19,14 @@ services:
       # Public vars also available at runtime (Next.js reads them for SSR)
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      # Recall.ai meeting bot
+      RECALL_API_KEY: ${RECALL_API_KEY}
+      RECALL_WEBHOOK_SECRET: ${RECALL_WEBHOOK_SECRET}
+      RECALL_API_URL: ${RECALL_API_URL}
+      # Google Calendar OAuth
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      # Production: https://app.joinflax.com/api/calendar/callback
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-https://app.joinflax.com/api/calendar/callback}
+      # Internal cron protection
+      CRON_SECRET: ${CRON_SECRET}

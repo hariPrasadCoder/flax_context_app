@@ -15,6 +15,7 @@ import {
   Search,
   LogOut,
   ChevronsUpDown,
+  CalendarDays,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -229,6 +230,17 @@ function UserMenu({ collapsed }: { collapsed?: boolean }) {
   )
 }
 
+function useProposalCount() {
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    fetch('/api/proposed-changes/count')
+      .then((r) => r.json())
+      .then((d) => setCount(d.count ?? 0))
+      .catch(() => {})
+  }, [])
+  return count
+}
+
 interface SidebarProps {
   onSearch?: () => void
   collapsed?: boolean
@@ -239,6 +251,7 @@ interface SidebarProps {
 export function Sidebar({ onSearch, collapsed = false, onCollapse, onClose }: SidebarProps) {
   const { projects, loading, createProject, createDocument } = useProjects()
   const pathname = usePathname()
+  const proposalCount = useProposalCount()
 
   // ── Collapsed (icon-only) mode — desktop only ────────────────────────────
   if (collapsed) {
@@ -285,6 +298,21 @@ export function Sidebar({ onSearch, collapsed = false, onCollapse, onClose }: Si
           >
             <Search className="w-4 h-4" />
           </button>
+          <Link
+            href="/meetings"
+            title="Meetings"
+            className={cn(
+              'relative w-9 h-9 flex items-center justify-center rounded-md transition-colors',
+              pathname === '/meetings'
+                ? 'bg-[var(--color-accent-subtle)] text-[var(--color-text)]'
+                : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
+            )}
+          >
+            <CalendarDays className="w-4 h-4" />
+            {proposalCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[var(--color-accent)]" />
+            )}
+          </Link>
           <Link
             href="/settings"
             title="Settings"
@@ -397,6 +425,23 @@ export function Sidebar({ onSearch, collapsed = false, onCollapse, onClose }: Si
           <span className="flex-1 text-left">Search</span>
           <kbd className="text-[10px] text-[var(--color-text-faint)] bg-[var(--color-border)] px-1.5 py-0.5 rounded font-mono">⌘K</kbd>
         </button>
+        <Link
+          href="/meetings"
+          className={cn(
+            'w-full flex items-center gap-2 px-2 py-2 rounded-md text-sm transition-colors',
+            pathname === '/meetings'
+              ? 'bg-[var(--color-accent-subtle)] text-[var(--color-text)] font-medium'
+              : 'text-[var(--color-text-muted)] hover:bg-[var(--color-sidebar-hover)] hover:text-[var(--color-text)]'
+          )}
+        >
+          <CalendarDays className="w-4 h-4" />
+          <span className="flex-1">Meetings</span>
+          {proposalCount > 0 && (
+            <span className="text-[10px] font-medium bg-[var(--color-accent)] text-white rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 font-mono">
+              {proposalCount > 99 ? '99+' : proposalCount}
+            </span>
+          )}
+        </Link>
         <Link
           href="/settings"
           className={cn(
