@@ -4,7 +4,6 @@ import { use, useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FileText, Plus, Clock, Trash2, ArrowLeft, Bot, Loader2, CalendarDays, ChevronDown, ChevronRight as ChevronRightIcon, Globe, Lock, EyeOff, UserRound, Users } from 'lucide-react'
-import { AppShell } from '@/components/layout/AppShell'
 import { useSettingsStore } from '@/stores/settings-store'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useProjects } from '@/hooks/useProjects'
@@ -225,7 +224,7 @@ function ProjectAccessSection({
             </ul>
           ) : null}
 
-          {/* Add member — always shown when restricted and not loading */}
+          {/* Add member */}
           {!loadingMembers && (
             <div className="flex items-center gap-1.5 pt-1">
               <div className="relative flex-1 min-w-0">
@@ -415,7 +414,6 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
 
   const project = projects.find((p) => p.id === projectId)
 
-  // Sync visibility from loaded project
   useEffect(() => {
     if (project?.visibility) setProjectVisibility(project.visibility)
   }, [project?.visibility])
@@ -461,61 +459,53 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
 
   if (loading) {
     return (
-      <AppShell>
-        <div className="flex-1 overflow-y-auto bg-[var(--color-surface)]">
-          <div className="max-w-3xl mx-auto px-8 py-10">
-            {/* Back link */}
-            <Skeleton className="h-4 w-24 mb-8" />
-            {/* Project header */}
-            <div className="flex items-center gap-4 mb-10">
-              <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
-              <div className="space-y-2 flex-1">
-                <Skeleton className="h-6 w-48" />
-                <Skeleton className="h-3.5 w-72" />
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <Skeleton className="h-8 w-32 rounded" />
-                <Skeleton className="h-8 w-24 rounded" />
-              </div>
+      <div className="flex-1 overflow-y-auto bg-[var(--color-surface)]">
+        <div className="max-w-3xl mx-auto px-8 py-10">
+          <Skeleton className="h-4 w-24 mb-8" />
+          <div className="flex items-center gap-4 mb-10">
+            <Skeleton className="w-12 h-12 rounded-xl shrink-0" />
+            <div className="space-y-2 flex-1">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-3.5 w-72" />
             </div>
-            {/* Tabs */}
-            <div className="flex gap-4 border-b border-[var(--color-border)] mb-6 pb-2">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-16" />
-            </div>
-            {/* Doc list */}
-            <div className="divide-y divide-[var(--color-border)]">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center gap-3 py-3">
-                  <Skeleton className="w-4 h-4 shrink-0" />
-                  <div className="flex-1 space-y-1.5">
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-              ))}
+            <div className="flex gap-2 shrink-0">
+              <Skeleton className="h-8 w-32 rounded" />
+              <Skeleton className="h-8 w-24 rounded" />
             </div>
           </div>
+          <div className="flex gap-4 border-b border-[var(--color-border)] mb-6 pb-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="divide-y divide-[var(--color-border)]">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center gap-3 py-3">
+                <Skeleton className="w-4 h-4 shrink-0" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </AppShell>
+      </div>
     )
   }
 
   if (!project) {
     return (
-      <AppShell>
-        <div className="flex-1 flex items-center justify-center bg-[var(--color-surface)]">
-          <p className="text-[var(--color-text-muted)]">Project not found.</p>
-        </div>
-      </AppShell>
+      <div className="flex-1 flex items-center justify-center bg-[var(--color-surface)]">
+        <p className="text-[var(--color-text-muted)]">Project not found.</p>
+      </div>
     )
   }
 
   const totalPending = Object.values(pendingByDoc).reduce((a, b) => a + b, 0)
 
   return (
-    <AppShell>
+    <>
       <div className="flex-1 overflow-y-auto bg-[var(--color-surface)]">
         <div className="max-w-3xl mx-auto px-8 py-10">
 
@@ -746,7 +736,7 @@ export default function ProjectPage({ params }: { params: Promise<{ projectId: s
           onDone={handleMeetingDone}
         />
       )}
-    </AppShell>
+    </>
   )
 }
 

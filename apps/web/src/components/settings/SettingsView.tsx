@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Link from 'next/link'
 import { useSettingsStore } from '@/stores/settings-store'
 import { useAuth } from '@/providers/AuthProvider'
 import { cn } from '@/lib/utils'
-import { Copy, Check, Link2, Trash2, RefreshCw } from 'lucide-react'
+import { Copy, Check, Link2, Trash2, RefreshCw, CalendarDays, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
 
 // ── Team Section ───────────────────────────────────────────────────────────────
@@ -257,6 +258,7 @@ function TeamSection() {
   )
 }
 
+
 // ── Primitives ──────────────────────────────────────────────────────────────────
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -450,6 +452,26 @@ export function SettingsView() {
               </span>
             </Row>
           </Section>
+
+          {/* Calendar & Bot — now lives on the Meetings page */}
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-faint)] mb-2 px-1">
+              Calendar &amp; Bot
+            </p>
+            <Link
+              href="/meetings"
+              className="flex items-center gap-3 px-4 py-3 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-sidebar-hover)] transition-colors group"
+            >
+              <CalendarDays className="w-4 h-4 text-[var(--color-text-muted)] shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-[var(--color-text)]">Meetings & Bot settings</p>
+                <p className="text-xs text-[var(--color-text-faint)] mt-0.5">
+                  Connect Google Calendar, manage auto-join, view recordings
+                </p>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[var(--color-text-faint)] group-hover:text-[var(--color-text)] transition-colors shrink-0" />
+            </Link>
+          </div>
 
           {/* Team */}
           {org && (

@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Paths that don't require authentication
-const PUBLIC_PATHS = ['/auth', '/invite', '/share']
+const PUBLIC_PATHS = ['/auth', '/invite', '/share', '/api/webhooks', '/api/cron']
 
 export async function middleware(request: NextRequest) {
   // Must create a new response and thread it through for cookie refresh to work.
